@@ -1,0 +1,13 @@
+{
+  "base_dir": "/usr/local/sonar-connector",
+  "log_level" : "info",
+  
+  "connectors": {
+    "dummy_connector": {
+      "name": "dummy_connector1"
+    },
+    "dummy_connector": {
+      "name": "dummy_connector2"
+    }
+  }
+}

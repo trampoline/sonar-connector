@@ -1,3 +1,5 @@
+require 'singleton'
+
 module Sonar
   module Connector
     class Config

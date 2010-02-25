@@ -5,7 +5,7 @@ module Sonar
       attr_reader :logger, :queue
       
       def initialize(queue)
-        @logger = Sonar::Connector::Logger.new
+        # initialise logger here too
         @queue = queue
       end
       

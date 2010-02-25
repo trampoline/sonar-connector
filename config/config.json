@@ -1,0 +1,7 @@
+{
+  "connectors": {
+    "dummy_connector": {
+      "name": "dummy_connector1"
+    }
+  }
+}

@@ -2,31 +2,34 @@ require 'spec_helper'
 
 describe Sonar::Connector::Config do
   
-  describe "self.create" do
+  describe "self.read_config" do
     before do
       @config_file = <<-JAVASCRIPT
-      {
-        "log_level": "warn"
-      }
+        {
+          "log_level": "warn"
+        }
       JAVASCRIPT
-      mock(IO).read('filename'){@config_file}
+      mock(IO).read('config_filename'){@config_file}
+    end
+    
+    def new_config
+      Sonar::Connector::Config.read_config('config_filename')
     end
     
     it "should return config" do
-      c = Sonar::Connector::Config.create('filename')
-      c.should be_instance_of(Sonar::Connector::Config)
+      new_config.should be_instance_of(Sonar::Connector::Config)
     end
     
     it "should set CONFIG constant" do
-      # yes i know that blatting the constant like this is evil
       Sonar::Connector.send(:remove_const, "CONFIG") if defined?(Sonar::Connector::CONFIG)
       defined?(Sonar::Connector::CONFIG).should be_false
-      Sonar::Connector::Config.create('filename')
+      new_config
       Sonar::Connector::CONFIG.should be_instance_of(Sonar::Connector::Config)
     end
+    
   end
   
-  describe "parse" do
+  describe "parse!" do
     
     before do
       @raw_config = {
@@ -34,8 +37,17 @@ describe Sonar::Connector::Config do
       }
     end
     
-    it "should set log_level" do
-      pending
+    def create_and_parse
+      Sonar::Connector::Config.new(@raw_config).send(:parse!)
+    end
+    
+    it "should return the config instance" do
+      create_and_parse.should be_instance_of(Sonar::Connector::Config)
+    end
+    
+    it "should symbolize log_level" do
+      @raw_config["log_level"] = "info"
+      create_and_parse.log_level.should == :info
     end
     
   end

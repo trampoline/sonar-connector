@@ -7,15 +7,14 @@ module Sonar
   module Connector
     class Controller
       
-      attr_reader :queue, :connector_threads, :logger, :config
+      attr_reader :queue, :connector_threads, :log, :config
             
       def initialize(config_filename)
-        Sonar::Connector::Config.parse(config_filename)
-        @config = Sonar::Connector::CONFIG
+        @config = Sonar::Connector::Config.read_config(config_filename)
         @queue = Queue.new
         @connector_threads = []
-        @log = Logger.new()
-        @log.level = @config["log_level"]
+        # @log = Logger.new()
+        # @log.level = @config.log_level
       end
       
       def start

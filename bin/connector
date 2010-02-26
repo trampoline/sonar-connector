@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'optparse'
+require 'sonar_connector'
+
+options = {
+  :start=>false,
+  :check_config=>false
+}
+
+ARGV.options do |opts|
+  script_name = File.basename($0)
+
+  opts.banner = "Usage: #{script_name} OPTION"
+  opts.separator "Specific options:"
+  
+  opts.on("--start", String, "Starts the connector process") {|v| options[:start] = true}
+  opts.on("--check", String, "Validates the connector config.json file") {|v| options[:check] = true}
+  opts.parse!
+end
+
+config_filename = File.join File.expand_path(File.dirname(__FILE__)), "..", "config", "config.json"
+
+if options[:start]
+  Sonar::Connector::Controller.new(config_filename).start
+elsif options[:check_config]
+  Sonar::Connector::Controller.new(config_filename)
+end

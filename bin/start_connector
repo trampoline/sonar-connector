@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'sonar_connector'
-
-config_filename = File.join File.expand_path(File.dirname(__FILE__)), "..", "config", "config.json"
-Sonar::Connector::Controller.new(config_filename).start

@@ -2,11 +2,18 @@ module Sonar
   module Connector
     class Base
       
-      attr_reader :logger, :queue
+      attr_reader :name, :logger
       
-      def initialize(queue)
-        # initialise logger here too
-        @queue = queue
+      def initialize(settings)
+        @name = settings["name"]
+        
+        parse settings
+        
+        # initialise logger here
+      end
+      
+      def parse(settings)
+        raise InvalidConfig.new("class #{self.class} must implement #parse method")
       end
       
     end

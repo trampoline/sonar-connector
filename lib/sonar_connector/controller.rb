@@ -9,7 +9,7 @@ module Sonar
     class Controller
       
       attr_reader :queue, :connectors, :log, :config
-            
+      
       def initialize(config_filename)
         # Parse the config file and create instances of each connector, 
         # parsing their config in turn.

@@ -20,4 +20,5 @@ pkg
 
 ## PROJECT::SPECIFIC
 var/*
+log/*
 config/config.json

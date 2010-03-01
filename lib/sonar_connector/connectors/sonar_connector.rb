@@ -6,8 +6,8 @@ module Sonar
         
       end
       
-      def run(queue)
-        sleep
+      def action
+        
       end
       
     end

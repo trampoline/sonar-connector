@@ -17,7 +17,6 @@
       "type": "dummy_connector",
       "name": "dummy_connector1",
       "repeat_delay": 10
-      
     },
     {
       "type": "ping_connector",

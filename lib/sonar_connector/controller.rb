@@ -8,7 +8,17 @@ module Sonar
   module Connector
     class Controller
       
-      attr_reader :queue, :connectors, :log, :config
+      # single command queue for threads to communicate with the controller
+      attr_reader :queue
+      
+      # array of instantiated connector instances
+      attr_reader :connectors
+      
+      # controller logger
+      attr_reader :log
+      
+      # instance of Sonar::Connector::Config
+      attr_reader :config
       
       def initialize(config_filename)
         # Parse the config file and create instances of each connector, 
@@ -24,6 +34,8 @@ module Sonar
         raise RuntimeError, "Invalid configuration in #{config_filename}: \n #{e.message}"
       end
       
+      
+      # Main connector loop. Fire up one thread per connector, and monitor the queue.
       def start
         log_startup_params
         create_startup_dirs_and_files

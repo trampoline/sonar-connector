@@ -2,7 +2,23 @@ module Sonar
   module Connector
     class Base
       
-      attr_reader :name, :connector_dir, :log, :state, :repeat_delay, :queue
+      # every connector has a unique name
+      attr_reader :name
+      
+      # each connector instance has a working dir for its state and files
+      attr_reader :connector_dir
+      
+      # log instance
+      attr_reader :log
+      
+      # state hash that is serialized and persisted to disk every cycle of the run loop
+      attr_reader :state
+      
+      # repeat delay which is waited out on each cycle of the run loop
+      attr_reader :repeat_delay
+      
+      # central command queue for sending messages back to the controller
+      attr_reader :queue
       
       def initialize(connector_config, base_config)
         @name = connector_config["name"]
@@ -13,17 +29,19 @@ module Sonar
         @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
         @log.level = base_config.log_level
         
+        # every connector instance must set the repeat delay
         raise InvalidConfig.new("Connector '#{@name}': repeat_delay is missing or blank") if connector_config["repeat_delay"].blank?
         @repeat_delay = connector_config["repeat_delay"].to_i
-        @connector_dir = File.join(base_config.connectors_dir, @name)
         
+        @connector_dir = File.join(base_config.connectors_dir, @name)
         FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
         
-        parse(connector_config)
+        parse connector_config
         load_state
       end
       
       def load_state
+        
         log.info "loading state"
         @state = {}
       end
@@ -32,7 +50,7 @@ module Sonar
         log.info "saving state"
       end
       
-      
+      # the main run loop that every connector executes indefinitely.
       def run(queue)
         @queue = queue
         load_state
@@ -42,14 +60,15 @@ module Sonar
             save_state
             sleep repeat_delay
           rescue Exception => e
-            log.error("Connector '#{name} blew out with an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}")
-            log.info("restarting connector after exception in 5 seconds.")
+            log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
+            log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
             sleep 5
+            retry
           end
         end
-        
       end
       
+      # All connector subclasses must implement the parse method.
       def parse(config)
         raise RuntimeError.new("class #{self.class} must implement #parse method")
       end

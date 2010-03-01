@@ -2,6 +2,14 @@ require 'net/ping'
 
 module Sonar
   module Connector
+    
+    # A useful connector that pings a server regularly. Use the following connector JSON config:
+    # {
+    #   "type": "ping_connector",
+    #   "name": "ping_connector1",
+    #   "repeat_delay": 60,
+    #   "host": "www.google.com"
+    # }
     class PingConnector < Sonar::Connector::Base
       
       attr_accessor :host
@@ -10,7 +18,7 @@ module Sonar
       def parse(config)
         @host = config["host"]
         raise InvalidConfig.new("Connector '#{@name}': host parameter cannot be blank") if @host.blank?
-        config["port"].blank? ? @port = 80 : config["port"].to_i
+        @port = config["port"].blank? ? 80 : config["port"].to_i
       end
       
       def action

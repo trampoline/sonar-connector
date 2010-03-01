@@ -3,11 +3,10 @@ module Sonar
     class DummyConnector < Sonar::Connector::Base
       
       def parse(config)
-        
       end
       
       def action
-        queue.push("#{name} mumbled aimlessly at #{Time.now.to_s}")
+        queue.push "#{name} mumbled aimlessly at #{Time.now.to_s}"
       end
       
     end

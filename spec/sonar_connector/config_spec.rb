@@ -33,9 +33,9 @@ describe Sonar::Connector::Config do
     
   end
   
-  describe "parse!" do
+  describe "parse" do
     def create_and_parse
-      Sonar::Connector::Config.new('config_file').parse!
+      Sonar::Connector::Config.new('config_file').parse
     end
     
     it "should return the config instance" do

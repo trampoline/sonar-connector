@@ -6,7 +6,10 @@ require 'sonar_connector'
 
 options = {
   :start=>false,
+  :check=>false
 }
+
+
 
 ARGV.options do |opts|
   script_name = File.basename($0)
@@ -14,18 +17,32 @@ ARGV.options do |opts|
   opts.banner = "Usage: #{script_name} OPTION"
   opts.separator "Specific options:"
   
-  opts.on("--start", String, "Starts the connector process") {|v| options[:start] = true}
-  opts.on("--check", String, "Validates the connector config.json file") {|v| options[:check] = false}
+  opts.on("--start", String, "Start the connector") {|v| options[:start] = true}
+  opts.on("--check", String, "Validate the connector config") {|v| options[:check] = true}
+  
+  opts.on_tail("-v", "--version", "Show version") {
+    version_file = File.join File.expand_path(File.dirname(__FILE__)), "..", "VERSION"
+    puts "SONAR Connector Framework #{File.read(version_file)}"
+    exit
+  }
+  
+  opts.on_tail("-h", "--help", "Show this message") {
+    puts opts
+    exit
+  }
   opts.parse!
 end
+
 
 config_filename = File.join File.expand_path(File.dirname(__FILE__)), "..", "config", "config.json"
 
 if options[:start]
   puts "Bootstrapping the connector framework from config file #{config_filename}. Check logs for details."
   Sonar::Connector::Controller.new(config_filename).start
-else
+elsif options[:check]
   puts "Checking config in #{config_filename}:"
   Sonar::Connector::Controller.new(config_filename)
   puts "...clean."
+else
+  puts ARGV.options
 end

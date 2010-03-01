@@ -19,7 +19,7 @@ module Sonar
       # Entry-point for creating and setting the CONFIG instance.
       # Give it a path to the JSON settings file and it'll do the rest.
       def self.read_config(config_file)
-        config = Config.new(config_file).parse!
+        config = Config.new(config_file).parse
         Sonar::Connector.const_set("CONFIG", config)
       end
       
@@ -27,7 +27,7 @@ module Sonar
         @config_file = config_file
       end
       
-      def parse!
+      def parse
         @raw_config = JSON.parse IO.read(@config_file)
         
         # extract the core config params

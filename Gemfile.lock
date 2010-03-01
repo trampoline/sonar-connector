@@ -4,6 +4,10 @@ dependencies:
     group: 
     - :test
     version: ">= 0"
+  net-ping: 
+    group: 
+    - :default
+    version: ">= 0"
   actionmailer_extensions: 
     group: 
     - :default
@@ -12,11 +16,11 @@ dependencies:
     group: 
     - :test
     version: ">= 0"
-  json_pure: 
+  actionmailer: 
     group: 
     - :default
     version: ">= 0"
-  actionmailer: 
+  json_pure: 
     group: 
     - :default
     version: ">= 0"
@@ -37,11 +41,13 @@ specs:
     version: 2.3.5
 - rspec: 
     version: 1.3.0
+- net-ping: 
+    version: 1.3.2
 - rr: 
     version: 0.10.9
 - actionmailer_extensions: 
     version: 0.2.0
-hash: 3db787590d9fbc2cc6276aad82b71683cfc0d429
+hash: 9ac3af1a779b04cd2de5682a988dfbf9ee16905d
 sources: 
 - Rubygems: 
     uri: http://gemcutter.org

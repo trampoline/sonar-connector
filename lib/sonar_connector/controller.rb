@@ -17,16 +17,16 @@ module Sonar
         @connectors = @config.connectors
         
         @queue = Queue.new
-        @log = Logger.new @config.controller_log_file
-        @log.level = Logger.const_get @config.log_level.upcase
+        @log = Logger.new(@config.controller_log_file, @config.log_files_to_keep, @config.log_file_max_size)
+        @log.level = @config.log_level
         
       rescue Sonar::Connector::InvalidConfig => e
         raise RuntimeError, "Invalid configuration in #{config_filename}: \n #{e.message}"
       end
       
       def start
-        log_startup_params!
-        create_startup_dirs_and_files!
+        log_startup_params
+        create_startup_dirs_and_files
         
         # fire up the connector threads
         connectors.each do |connector|
@@ -44,14 +44,14 @@ module Sonar
       
       private
       
-      def log_startup_params!
+      def log_startup_params
         log.info "Startup: base directory is #{config.base_dir}"
         log.info "Startup: logging directory is #{config.log_dir}"
         log.info "Startup: log level is #{config.log_level}"
         log.info "Startup: controller logging to #{config.controller_log_file}"
       end
 
-      def create_startup_dirs_and_files!
+      def create_startup_dirs_and_files
         FileUtils.mkdir_p(config.base_dir) unless File.directory?(config.base_dir)
         FileUtils.mkdir_p(config.log_dir) unless File.directory?(config.log_dir)
         FileUtils.touch config.controller_log_file

@@ -22,6 +22,7 @@ end
 config_filename = File.join File.expand_path(File.dirname(__FILE__)), "..", "config", "config.json"
 
 if options[:start]
+  puts "Bootstrapping the connector framework from config file #{config_filename}. Check logs for details."
   Sonar::Connector::Controller.new(config_filename).start
 else
   puts "Checking config in #{config_filename}:"

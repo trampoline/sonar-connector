@@ -2,16 +2,20 @@ require 'spec_helper'
 
 describe Sonar::Connector::Config do
   
+  before do
+    @config = {
+      "log_level" => "warn",
+      "connectors" => [
+        "name" => "dummy_connector_1",
+        "type" => "dummy_connector",
+        "repeat_delay" => 10
+      ]
+    }
+    @config_file_contents = @config.to_json
+    mock(IO).read('config_file'){@config_file_contents}
+  end
+  
   describe "self.read_config" do
-    before do
-      @config_file_contents = <<-JAVASCRIPT
-        {
-          "log_level": "warn"
-        }
-      JAVASCRIPT
-      mock(IO).read('config_file'){@config_file_contents}
-    end
-    
     def new_config
       Sonar::Connector::Config.read_config('config_file')
     end
@@ -30,14 +34,6 @@ describe Sonar::Connector::Config do
   end
   
   describe "parse!" do
-    
-    before do
-      @raw_config = {
-        "log_level" => "warn"
-      }
-      mock(IO).read('config_file'){@raw_config.to_json}
-    end
-    
     def create_and_parse
       Sonar::Connector::Config.new('config_file').parse!
     end
@@ -47,8 +43,9 @@ describe Sonar::Connector::Config do
     end
     
     it "should symbolize log_level" do
-      @raw_config["log_level"] = "error"
-      create_and_parse.log_level.should == "error"
+      @config["log_level"] = "error"
+      @config_file_contents = @config.to_json
+      create_and_parse.log_level.should == Logger::ERROR
     end
     
   end

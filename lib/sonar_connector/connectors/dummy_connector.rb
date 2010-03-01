@@ -2,18 +2,12 @@ module Sonar
   module Connector
     class DummyConnector < Sonar::Connector::Base
       
-      def parse(settings)
+      def parse(config)
         
       end
       
-      def run(queue)
-        
-        i = 0
-        while true
-          queue.push("message number #{i}")
-          i += 1
-          sleep(1)
-        end
+      def action
+        queue.push("#{name} mumbled aimlessly at #{Time.now.to_s}")
       end
       
     end

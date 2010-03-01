@@ -5,6 +5,7 @@ group :default do
   gem "actionmailer"
   gem "actionmailer_extensions"
   gem "json_pure"
+  gem "net-ping"
 end
 
 group :test do

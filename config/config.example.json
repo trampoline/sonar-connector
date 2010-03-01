@@ -1,14 +1,29 @@
 {
+  /* log level must be one of: "debug", "info", "warn", "error", "fatal" */
   "log_level" : "info",
   
+  /* max log file size in megabytes */
+  "log_file_max_size" : "10",
+  
+  /* log files to keep */
+  "log_files_to_keep" : "7",
+  
+  /* 
+    Specific configuration for each connector. Each connector must have 
+    a type and a unique name. Note that each connector type may have different configuration.
+  */
   "connectors": [
     {
       "type": "dummy_connector",
-      "name": "dummy_connector1"
+      "name": "dummy_connector1",
+      "repeat_delay": 10
+      
     },
     {
-      "type": "dummy_connector",
-      "name": "dummy_connector2"
+      "type": "ping_connector",
+      "name": "ping_connector1",
+      "repeat_delay": 60,
+      "host": "www.google.com"
     }
   ]
 }

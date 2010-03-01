@@ -22,3 +22,4 @@ pkg
 var/*
 log/*
 config/config.json
+.bundle

@@ -9,8 +9,6 @@ options = {
   :check=>false
 }
 
-
-
 ARGV.options do |opts|
   script_name = File.basename($0)
 

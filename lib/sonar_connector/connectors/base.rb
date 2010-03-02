@@ -37,16 +37,28 @@ module Sonar
         FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
         
         parse connector_config
+        
+        @state_file = File.join(@connector_dir, "state.json")
         load_state
       end
       
       def load_state
-        
-        log.info "loading state"
+        if File.exists? @state_file
+          @state = JSON.parse IO.read(@state_file)
+          raise "State file did not contain a serialised hash." unless @state 
+          log.info "Loaded state file #{@state_file}"
+        else
+          @state = {}
+          File.open(@state_file, "w+"){|f| f << {}.to_json }
+          log.info "Wrote empty state file to #{@state_file}"
+        end
+      rescue Exception => e
         @state = {}
+        log.error "Error loading #{@state_file}. Ignoring it and it will be over-written on the next save_state cycle. Original error: #{e.message}"
       end
       
       def save_state
+        File.open(@state_file, "w+"){|f| f << state.to_json }
         log.info "saving state"
       end
       
@@ -75,7 +87,7 @@ module Sonar
       
       private
       
-      attr_reader :raw_connector_config
+      attr_reader :raw_connector_config, :state_file
       
     end
   end

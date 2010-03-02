@@ -21,6 +21,7 @@ module Sonar
       attr_reader :config
       
       def initialize(config_filename)
+        
         # Parse the config file and create instances of each connector, 
         # parsing their config in turn.
         @config = Sonar::Connector::Config.read_config(config_filename)

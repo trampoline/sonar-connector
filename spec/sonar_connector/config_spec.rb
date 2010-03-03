@@ -15,9 +15,9 @@ describe Sonar::Connector::Config do
     mock(IO).read('config_file'){@config_file_contents}
   end
   
-  describe "self.read_config" do
+  describe "self.load" do
     def new_config
-      Sonar::Connector::Config.read_config('config_file')
+      Sonar::Connector::Config.load('config_file')
     end
     
     it "should return config" do

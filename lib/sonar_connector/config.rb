@@ -18,9 +18,14 @@ module Sonar
       
       # Entry-point for creating and setting the CONFIG instance.
       # Give it a path to the JSON settings file and it'll do the rest.
-      def self.read_config(config_file)
+      def self.load(config_file)
         config = Config.new(config_file).parse
         Sonar::Connector.const_set("CONFIG", config)
+      end
+      
+      # Helper method to read and parse JSON file from disk. Abstracted for testing purposes.
+      def self.read_json_file(config_file)
+        JSON.parse IO.read(config_file)
       end
       
       def initialize(config_file)
@@ -28,7 +33,7 @@ module Sonar
       end
       
       def parse
-        @raw_config = JSON.parse IO.read(@config_file)
+        @raw_config = Config.read_json_file(config_file)
         
         # extract the core config params
         @base_dir = parse_base_dir @raw_config["base_dir"]

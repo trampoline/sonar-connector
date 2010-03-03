@@ -8,4 +8,9 @@ require 'rr'
 
 Spec::Runner.configure do |config|
   config.mock_with :rr
+  
+  
+  config.append_before(:each) do
+    # stub()
+  end
 end

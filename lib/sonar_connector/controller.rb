@@ -24,7 +24,7 @@ module Sonar
         
         # Parse the config file and create instances of each connector, 
         # parsing their config in turn.
-        @config = Sonar::Connector::Config.read_config(config_filename)
+        @config = Sonar::Connector::Config.load config_filename
         @connectors = @config.connectors
         
         @queue = Queue.new

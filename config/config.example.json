@@ -10,7 +10,8 @@
   
   /* 
     Specific configuration for each connector. Each connector must have 
-    a type and a unique name. Note that each connector type may have further configuration options.
+    a type and a unique name. Note that each connector type may have further configuration options
+    that are specific to the connector type.
   */
   "connectors": [
     {

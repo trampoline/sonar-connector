@@ -37,4 +37,5 @@ ARGV.options do |opts|
   opts.parse!
 end
 
+# default action 
 puts ARGV.options

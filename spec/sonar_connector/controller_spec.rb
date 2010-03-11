@@ -20,4 +20,24 @@ describe Sonar::Connector::Controller do
     end
   end
   
+  describe "start" do
+    before do
+      
+      # Add another connector so we have two in total
+      @config_options["connectors"] << {
+        "name" => "dummy_connector_2",
+        "type" => "dummy_connector",
+        "repeat_delay" => 10
+      }
+      
+      @controller = Sonar::Connector::Controller.new(valid_config_filename)
+    end
+    
+    it "should invoke a thread for each connector" do
+      pending
+      stub(Thread).new().times(2){true}
+      @controller.start
+    end
+  end
+
 end

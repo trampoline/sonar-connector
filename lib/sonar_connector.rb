@@ -8,12 +8,18 @@ rescue LoadError
   Bundler.setup
 end
 
+require 'rubygems'
+require 'active_support'
+require 'json'
+require 'thread'
+require 'logger'
+require 'action_mailer'
+require 'actionmailer_extensions'
+
 require 'sonar_connector/controller'
 require 'sonar_connector/config'
 require 'sonar_connector/consumer'
-
 require 'sonar_connector/connectors/base'
 require 'sonar_connector/connectors/dummy_connector'
 require 'sonar_connector/connectors/ping_connector'
-
 require 'sonar_connector/commands/command'

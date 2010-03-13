@@ -1,9 +1,3 @@
-require 'rubygems'
-require 'active_support'
-require 'json'
-require 'thread'
-require 'logger'
-
 module Sonar
   module Connector
     class Controller

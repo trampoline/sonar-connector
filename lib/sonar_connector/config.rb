@@ -10,6 +10,7 @@ module Sonar
       attr_reader :connectors_dir
       attr_reader :controller_log_file
       attr_reader :connectors
+      attr_reader :email_settings
       
       # configurable: logger params
       attr_reader :log_level
@@ -43,6 +44,7 @@ module Sonar
         @log_level = parse_log_level @raw_config["log_level"]
         @log_file_max_size = parse_log_file_max_size @raw_config["log_file_max_size"]
         @log_files_to_keep = parse_log_files_to_keep @raw_config["log_files_to_keep"]
+        @email_settings = parse_email_settings @raw_config["email_settings"]
         
         # extract each connector, locate its class and attempt to parse its config
         @connectors = parse_connectors @raw_config["connectors"]
@@ -80,6 +82,20 @@ module Sonar
         log_files_to_keep.blank? ? 10 : log_files_to_keep.to_i
       end
       
+      def parse_email_settings(settings)
+        ActionMailer::Base.perform_deliveries = settings["perform_deliveries"]
+        ActionMailer::Base.delivery_method = settings["delivery_method"].to_sym
+        ActionMailer::Base.raise_delivery_errors = settings["raise_delivery_errors"]
+        
+        # ActionMailer needs the smtp and sendmail settings hashes to have symbols for keys
+        ActionMailer::Base.smtp_settings  = symbolise_hash_keys settings["smtp_settings"]
+        ActionMailer::Base.sendmail_settings = symbolise_hash_keys settings["sendmail_settings"]
+        
+        ActionMailer::Base.save_emails_to_disk = settings["save_emails_to_disk"]
+        ActionMailer::Base.email_output_dir = File.join @base_dir, 'sent_administrator_emails'
+        ActionMailer::Base.safe_recipients = [:all]
+      end
+      
       def parse_connectors(connectors_config)
         raise InvalidConfig.new("Connector parameter must be an array and cannot be empty") unless connectors_config.instance_of?(Array) && !connectors_config.empty?
         
@@ -114,6 +130,11 @@ module Sonar
         # sanity-check that the connector class subclasses the base
         raise InvalidConfig.new("Connector class #{klass.name} must subclass Sonar::Connector::Base") unless klass.ancestors.include?(Sonar::Connector::Base)
         klass.new(config, self)
+      end
+      
+      def symbolise_hash_keys(hash)
+        return nil unless hash
+        hash.keys.inject({}){|acc, k| acc[k.to_sym] = hash[k]; acc}
       end
       
     end

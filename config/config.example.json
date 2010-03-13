@@ -5,8 +5,34 @@
   /* max log file size in megabytes */
   "log_file_max_size" : "10",
   
-  /* log files to keep */
+  /* number of log files to keep */
   "log_files_to_keep" : "7",
+  
+  "email_settings": {
+    "admin_recipients": ["originalpete@gmail.com"],
+    "perform_deliveries": false,
+    
+    /* options are ["smtp", "sendmail", "test"] */
+    "delivery_method": "smtp",
+    "raise_delivery_errors": true,
+    "save_emails_to_disk": false,
+    
+    "smtp_settings": {
+      "address": "127.0.0.1",
+      "port": 25,
+      "domain": "server.local",
+      "user_name": null,
+      "password": null,
+      
+      /* options are ["plain", "login", "cram_md5"] */
+      "authentication": null
+    },
+
+    "sendmail_settings": {
+      "location": "/usr/sbin/sendmail",
+      "arguments": "-i -t -f nobody@localhost"
+    }
+  },
   
   /* 
     Specific configuration for each connector. Each connector must have 

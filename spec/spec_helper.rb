@@ -22,6 +22,14 @@ Spec::Runner.configure do |config|
       @config_options = {
         "log_level" => "warn",
         "base_dir" => base_dir,
+        "email_settings" => {
+          "admin_recipients" => ["originalpete@gmail.com"],
+          "perform_deliveries" => false,
+          "delivery_method" => "test",
+          "raise_delivery_errors" => true,
+          "save_emails_to_disk" => false
+        },
+        
         "connectors" => [
           "name" => "dummy_connector_1",
           "type" => "dummy_connector",

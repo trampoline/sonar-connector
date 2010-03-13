@@ -10,6 +10,10 @@ Spec::Runner.configure do |config|
   
   config.prepend_before(:each) do
     
+    def base_dir
+      "/tmp/sonar-connector/"
+    end
+    
     def valid_config_filename
       "path to a valid config file"
     end
@@ -17,6 +21,7 @@ Spec::Runner.configure do |config|
     def setup_valid_config_file
       @config_options = {
         "log_level" => "warn",
+        "base_dir" => base_dir,
         "connectors" => [
           "name" => "dummy_connector_1",
           "type" => "dummy_connector",
@@ -27,5 +32,9 @@ Spec::Runner.configure do |config|
       Sonar::Connector.send(:remove_const, "CONFIG") if defined?(Sonar::Connector::CONFIG)
     end
     
+    # This is slightly dangerous.
+    FileUtils.rm_rf(base_dir) if File.directory?(base_dir)
+    FileUtils.mkdir_p(base_dir)
   end
+  
 end

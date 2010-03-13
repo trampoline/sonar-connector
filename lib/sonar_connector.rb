@@ -10,7 +10,10 @@ end
 
 require 'sonar_connector/controller'
 require 'sonar_connector/config'
+require 'sonar_connector/consumer'
 
 require 'sonar_connector/connectors/base'
 require 'sonar_connector/connectors/dummy_connector'
 require 'sonar_connector/connectors/ping_connector'
+
+require 'sonar_connector/commands/command'

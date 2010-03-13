@@ -31,11 +31,12 @@ describe Sonar::Connector::Controller do
       }
       
       @controller = Sonar::Connector::Controller.new(valid_config_filename)
+      @controller.connectors.count.should == 2
     end
     
-    it "should invoke a thread for each connector" do
-      pending
-      stub(Thread).new().times(2){true}
+    it "should invoke a thread for each connector plus one for the consumer" do
+      mock(Thread).new().times(3){true} # once per conector and one for the consumer
+      stub(@controller).stop?{true}
       @controller.start
     end
   end

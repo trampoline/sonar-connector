@@ -3,6 +3,7 @@ require 'net/ping'
 module Sonar
   module Connector
     
+    ##
     # A useful connector that pings a server regularly and logs an error when it can't ping. 
     # Use the following connector JSON config:
     # {

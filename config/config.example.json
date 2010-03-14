@@ -10,12 +10,13 @@
   
   "email_settings": {
     "admin_recipients": ["originalpete@gmail.com"],
+    "admin_sender": "Sonar Connector <noreply@server.local>",
     "perform_deliveries": false,
     
     /* options are ["smtp", "sendmail", "test"] */
     "delivery_method": "smtp",
     "raise_delivery_errors": true,
-    "save_emails_to_disk": false,
+    "save_emails_to_disk": true,
     
     "smtp_settings": {
       "address": "127.0.0.1",

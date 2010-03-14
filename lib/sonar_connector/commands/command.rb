@@ -6,6 +6,18 @@ module Sonar
     
     class Command
       
+      attr_accessor :params
+      
+      class << self
+        class_eval do
+          def schedule(*params)
+            c = self.new
+            c.params = params
+            c
+          end
+        end
+      end
+      
     end
   end
 end

@@ -94,6 +94,7 @@ module Sonar
         ActionMailer::Base.save_emails_to_disk = settings["save_emails_to_disk"]
         ActionMailer::Base.email_output_dir = File.join @base_dir, 'sent_administrator_emails'
         ActionMailer::Base.safe_recipients = [:all]
+        settings
       end
       
       def parse_connectors(connectors_config)

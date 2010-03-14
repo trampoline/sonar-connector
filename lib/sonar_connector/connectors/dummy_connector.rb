@@ -9,7 +9,7 @@ module Sonar
       end
       
       def action
-        queue.push "#{name} mumbled aimlessly at #{Time.now.to_s}"
+        log.debug "#{name} mumbled incoherently to itself at #{Time.now.to_s}"
       end
       
     end

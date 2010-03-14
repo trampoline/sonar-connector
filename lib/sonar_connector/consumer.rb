@@ -26,9 +26,12 @@ module Sonar
         switch_to_log_file
         
         while true
-          message = queue.pop
-          # process the queue here
-          log.info "consumed message: #{message}"
+          command = queue.pop
+          begin
+            command.execute(*command.params)
+          rescue Exception => e
+            log.error "Command #{command.class} raised an unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
+          end
         end
       end
       

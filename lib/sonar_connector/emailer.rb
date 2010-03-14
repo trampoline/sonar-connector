@@ -1,12 +1,15 @@
 module Sonar
   module Connector
-    class Mailer < ActionMailer::Base
-      def admin_warning_email(message)
-        # from          Sonar::Connector::CONFIG.email_settings[""]
-        # recipients    search.user.email
-        # subject       "Bapzilla lunch recommendations for #{UserMailer.dayname}"
-        # content_type  "text/html"
-        # body          :search => search, :shops => shops
+    class Emailer < ActionMailer::Base
+      def admin_message(connector, message)
+        from          Sonar::Connector::CONFIG.email_settings["admin_sender"]
+        recipients    Sonar::Connector::CONFIG.email_settings["admin_sender"]
+        subject       "Admin email from Sonar Connector"
+        content_type  "text/plain"
+        body          <<-BODY
+Admin email from Sonar Connector. The connector '#{connector.name}' sent the following message:
+#{message}
+BODY
       end
     end
   end

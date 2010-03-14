@@ -36,5 +36,9 @@ describe Sonar::Connector::Config do
       @config.log_level.should == Logger::ERROR
     end
     
+    it "should set email settings" do
+      @config.email_settings.should be_instance_of(Hash)
+    end
+    
   end
 end

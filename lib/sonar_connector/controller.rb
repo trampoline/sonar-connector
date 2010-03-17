@@ -40,8 +40,6 @@ module Sonar
         @log = Logger.new STDOUT
         @log.level = @config.log_level
         
-        @stop = false
-        
       rescue Sonar::Connector::InvalidConfig => e
         raise RuntimeError, "Invalid configuration in #{config_filename}: \n #{e.message}"
       end
@@ -68,33 +66,26 @@ module Sonar
         #threads << Thread.new{ consumer.watch(queue) }
         Thread.new{ consumer.watch(queue) }
         
+        cleanup = lambda {
+          puts "\nGiving threads 10 seconds to shut down..."
+          connectors.map(&:stop!)
+          begin
+            Timeout::timeout(10) { threads.map(&:join) }
+            puts "...exited cleanly."
+            exit(0)
+          rescue Timeout::Error
+            puts "...couldn't stop all threads cleanly."
+            exit(1)
+          end
+        }
+        
+        # let the controlling thread go into an endless sleep.
         puts "Ctrl-C to stop."
-        trap "SIGINT", proc{ stop! }
-        
-        while !stop?
-          sleep(0.1)
-        end
-        
-        puts "Waiting 10 seconds for connectors to shut down"
-        connectors.map(&:stop!)
-        begin
-          Timeout::timeout(10) { threads.map(&:join) }
-          puts "Exited cleanly."
-        rescue Timeout::Error
-          puts "Couldn't stop all threads cleanly. Meh."
-        end
-        
+        trap "SIGINT", cleanup
+        sleep
       end
       
       private
-      
-      def stop!
-        @stop = true
-      end
-      
-      def stop?
-        @stop
-      end
       
       def log_startup_params
         log.info "Startup: base directory is #{config.base_dir}"
@@ -102,7 +93,7 @@ module Sonar
         log.info "Startup: log level is #{config.log_level}"
         log.info "Startup: controller logging to #{config.controller_log_file}"
       end
-
+      
       def create_startup_dirs_and_files
         FileUtils.mkdir_p(config.base_dir) unless File.directory?(config.base_dir)
         FileUtils.mkdir_p(config.log_dir) unless File.directory?(config.log_dir)

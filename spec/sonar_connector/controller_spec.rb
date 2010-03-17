@@ -37,8 +37,12 @@ describe Sonar::Connector::Controller do
     it "should invoke a thread for each connector plus one for the consumer" do
       t = Object.new
       stub(t).join(){true}
-      mock(Thread).new().times(3){t} # once per conector and one for the consumer
-      stub(@controller).stop?{true}
+      mock(Thread).new().times(4){t} # once per conector and one for the consumer, and once for the evil hack below.
+      
+      pid = Process.pid
+      # shut the controller down in 1 second
+      Thread.new{ sleep(2); system "kill -s INT #{pid}"; }
+      
       @controller.start
     end
   end

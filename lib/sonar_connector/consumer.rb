@@ -28,7 +28,7 @@ module Sonar
         while true
           command = queue.pop
           begin
-            command.execute(*command.params)
+            command.execute
           rescue Exception => e
             log.error "Command #{command.class} raised an unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
           end

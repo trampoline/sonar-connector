@@ -35,7 +35,7 @@ module Sonar
           @consecutive_errors += 1
           if @consecutive_errors == retry_count
             @consecutive_errors = 0
-            queue << Sonar::Connector::EmailCommand.schedule(self, "tried to ping #{host} but failed to reach it #{retry_count} times")
+            queue << Sonar::Connector::EmailCommand.new(self, "tried to ping #{host} but failed to reach it #{retry_count} times")
           end
         end
       end

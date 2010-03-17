@@ -35,7 +35,9 @@ describe Sonar::Connector::Controller do
     end
     
     it "should invoke a thread for each connector plus one for the consumer" do
-      mock(Thread).new().times(3){true} # once per conector and one for the consumer
+      t = Object.new
+      stub(t).join(){true}
+      mock(Thread).new().times(3){t} # once per conector and one for the consumer
       stub(@controller).stop?{true}
       @controller.start
     end

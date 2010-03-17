@@ -43,7 +43,8 @@ module Sonar
         raise InvalidConfig.new("Connector '#{@name}': repeat_delay must be >= 1 second") if @repeat_delay < 1
         
         @connector_dir = File.join(base_config.connectors_dir, @name)
-        @state_file = File.join(@connector_dir, "state.json")
+        @state_file = File.join(@connector_dir, "state.yml")
+        @state = {}
         
         parse connector_config
       end
@@ -55,27 +56,32 @@ module Sonar
         @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
       end
       
+      ## 
+      # Load @state variable from the YAML state file
       def load_state
         if File.exists? @state_file
-          @state = JSON.parse IO.read(@state_file)
-          raise "State file did not contain a serialised hash." unless @state 
+          @state = YAML.load_file @state_file
+          raise "State file did not contain a serialised hash." unless @state.is_a?(Hash)
           log.info "Loaded state file #{@state_file}"
         else
-          @state = {}
-          File.open(@state_file, "w+"){|f| f << {}.to_json }
-          log.info "Wrote empty state file to #{@state_file}"
+          save_state
+          log.info "Created new state file #{@state_file}"
         end
       rescue Exception => e
         @state = {}
-        log.error "Error loading #{@state_file}. Ignoring it and it will be over-written on the next save_state cycle. Original error: #{e.message}"
+        log.error "Error loading #{@state_file} so it was ignored and the internal connector state was reset. Original error: #{e.message}"
       end
       
+      ##
+      # Save the @state to a YAML file
       def save_state
-        File.open(@state_file, "w+"){|f| f << state.to_json }
-        log.info "saving state"
+        File.open(@state_file, "w"){|f| f << state.to_yaml }
+        log.info "saved state to #{@state_file}"
       end
       
-      # the main run loop that every connector executes indefinitely.
+      ##
+      # the main run loop that every connector executes indefinitely 
+      # until stop! called on the connector instance.
       def run(queue)
         @queue = queue
         
@@ -83,11 +89,19 @@ module Sonar
         switch_to_log_file
         load_state
         
-        while true
+        while !stop?
           begin
             self.action
             save_state
-            sleep repeat_delay
+            
+            # break sleep time into 0.1 second chunks in order to exit the run loop
+            # if this connector is asked to stop during the sleep cycle. 
+            count_sleep_sections = repeat_delay / 0.1
+            count_sleep_sections.to_i.times do 
+              return if stop?
+              sleep(0.1)
+            end
+            
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
@@ -97,10 +111,17 @@ module Sonar
         end
       end
       
+      def stop!
+        @stop = true
+      end
+      
+      def stop?
+        @stop
+      end
+      
       ##
-      # All connector subclasses must implement the parse method.
+      # Connector subclasses can overload the parse method.
       def parse(config)
-        raise RuntimeError.new("class #{self.class} must implement #parse method")
       end
       
       private

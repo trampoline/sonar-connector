@@ -11,6 +11,7 @@ end
 require 'rubygems'
 require 'active_support'
 require 'json'
+require 'yaml'
 require 'thread'
 require 'logger'
 require 'action_mailer'

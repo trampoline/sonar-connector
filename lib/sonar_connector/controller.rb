@@ -21,6 +21,11 @@ module Sonar
       ##
       # instance of Sonar::Connector::Config
       attr_reader :config
+      
+      ##
+      # array of threads
+      attr_reader :threads
+      
 
       ##
       # Parse the config file and create instances of each connector, 
@@ -29,6 +34,7 @@ module Sonar
         @config = Sonar::Connector::Config.load config_filename
         @connectors = @config.connectors
         @consumer = Sonar::Connector::Consumer.new(@config)
+        @threads = []
         
         @queue = Queue.new
         @log = Logger.new STDOUT
@@ -55,10 +61,11 @@ module Sonar
         # fire up the connector threads
         connectors.each do |connector|
           log.info "starting connector '#{connector.name}'"
-          Thread.new { connector.run(queue) }
+          threads << Thread.new { connector.run(queue) }
         end
         
         log.info "starting the message queue consumer"
+        #threads << Thread.new{ consumer.watch(queue) }
         Thread.new{ consumer.watch(queue) }
         
         puts "Ctrl-C to stop."
@@ -68,7 +75,15 @@ module Sonar
           sleep(0.1)
         end
         
-        puts "shutdown routine"
+        puts "Waiting 10 seconds for connectors to shut down"
+        connectors.map(&:stop!)
+        begin
+          Timeout::timeout(10) { threads.map(&:join) }
+          puts "Exited cleanly."
+        rescue Timeout::Error
+          puts "Couldn't stop all threads cleanly. Meh."
+        end
+        
       end
       
       private

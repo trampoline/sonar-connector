@@ -82,7 +82,7 @@ module Sonar
         # let the controlling thread go into an endless sleep.
         puts "Ctrl-C to stop."
         trap "SIGINT", cleanup
-        sleep
+        endless_sleep
       end
       
       private
@@ -98,6 +98,10 @@ module Sonar
         FileUtils.mkdir_p(config.base_dir) unless File.directory?(config.base_dir)
         FileUtils.mkdir_p(config.log_dir) unless File.directory?(config.log_dir)
         FileUtils.touch config.controller_log_file
+      end
+      
+      def endless_sleep
+        sleep
       end
       
     end

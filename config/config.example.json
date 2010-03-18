@@ -15,7 +15,6 @@
     
     /* options are ["smtp", "sendmail", "test"] */
     "delivery_method": "smtp",
-    "raise_delivery_errors": true,
     "save_emails_to_disk": true,
     
     "smtp_settings": {

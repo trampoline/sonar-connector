@@ -85,7 +85,7 @@ module Sonar
       def parse_email_settings(settings)
         ActionMailer::Base.perform_deliveries = settings["perform_deliveries"]
         ActionMailer::Base.delivery_method = settings["delivery_method"].to_sym
-        ActionMailer::Base.raise_delivery_errors = settings["raise_delivery_errors"]
+        ActionMailer::Base.raise_delivery_errors = true
         
         # ActionMailer needs the smtp and sendmail settings hashes to have symbols for keys
         ActionMailer::Base.smtp_settings  = symbolise_hash_keys settings["smtp_settings"]

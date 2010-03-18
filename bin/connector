@@ -4,7 +4,7 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'optparse'
 require 'sonar_connector'
 
-config_filename = File.join File.expand_path(File.dirname(__FILE__)), "..", "config", "config.json"
+config_filename = File.expand_path File.join(File.dirname(__FILE__), "..", "config", "config.json")
 
 ARGV.options do |opts|
   script_name = File.basename($0)

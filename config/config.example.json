@@ -1,6 +1,6 @@
 {
   /* log level must be one of: "debug", "info", "warn", "error", "fatal" */
-  "log_level" : "info",
+  "log_level" : "debug",
   
   /* max log file size in megabytes */
   "log_file_max_size" : "10",

@@ -29,9 +29,17 @@ module Sonar
           command = queue.pop
           begin
             command.execute
+          
+          rescue ThreadTerminator
+            log.warn "Consumer is shutting down and there are #{queue.size} unprocessed commands on the queue." if queue.size > 0
+            log.info "Shut down consumer"
+            log.close
+            return true
+            
           rescue Exception => e
             log.error "Command #{command.class} raised an unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
           end
+          
         end
       end
       

@@ -81,7 +81,7 @@ module Sonar
       
       ##
       # the main run loop that every connector executes indefinitely 
-      # until stop! called on the connector instance.
+      # until Thread.raise is called on this instance.
       def run(queue)
         @queue = queue
         
@@ -89,18 +89,16 @@ module Sonar
         switch_to_log_file
         load_state
         
-        while !stop?
+        while true
           begin
             self.action
             save_state
+            sleep repeat_delay
             
-            # break sleep time into 0.1 second chunks in order to exit the run loop
-            # if this connector is asked to stop during the sleep cycle. 
-            count_sleep_sections = repeat_delay / 0.1
-            count_sleep_sections.to_i.times do 
-              return if stop?
-              sleep(0.1)
-            end
+          rescue ThreadTerminator
+            log.info "Shut down connector"
+            log.close
+            return true
             
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
@@ -109,14 +107,7 @@ module Sonar
             retry
           end
         end
-      end
-      
-      def stop!
-        @stop = true
-      end
-      
-      def stop?
-        @stop
+        
       end
       
       ##

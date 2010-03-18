@@ -1,5 +1,8 @@
 module Sonar
   module Connector
+    
+    class ThreadTerminator < Exception; end
+    
     class Controller
       
       ##
@@ -11,16 +14,16 @@ module Sonar
       attr_reader :connectors
 
       ##
-      # message consumer
+      # instance of Sonar::Connector::Consumer
       attr_reader :consumer
-      
-      ##
-      # controller logger
-      attr_reader :log
       
       ##
       # instance of Sonar::Connector::Config
       attr_reader :config
+      
+      ##
+      # controller logger
+      attr_reader :log
       
       ##
       # array of threads
@@ -63,20 +66,28 @@ module Sonar
         end
         
         log.info "starting the message queue consumer"
-        #threads << Thread.new{ consumer.watch(queue) }
-        Thread.new{ consumer.watch(queue) }
+        threads << Thread.new{ consumer.watch(queue) }
         
         cleanup = lambda {
           puts "\nGiving threads 10 seconds to shut down..."
-          connectors.map(&:stop!)
+          threads.each{|t| t.raise(ThreadTerminator.new)}
           begin
-            Timeout::timeout(10) { threads.map(&:join) }
-            puts "...exited cleanly."
-            exit(0)
+            Timeout::timeout(10) { 
+              threads.map(&:join) }
           rescue Timeout::Error
             puts "...couldn't stop all threads cleanly."
+            log.info "Could not cleanly terminate all threads."
+            log.close
             exit(1)
+          rescue Exception => e
+            # do nothing - don't care about exceptions from dying threads.
           end
+          
+          puts "...exited cleanly."
+          log.info "Terminated all threads cleanly."
+          log.close
+          exit(0)
+          
         }
         
         # let the controlling thread go into an endless sleep.
@@ -90,7 +101,7 @@ module Sonar
       def log_startup_params
         log.info "Startup: base directory is #{config.base_dir}"
         log.info "Startup: logging directory is #{config.log_dir}"
-        log.info "Startup: log level is #{config.log_level}"
+        log.info "Startup: log level is " + config.send(:raw_config)['log_level']
         log.info "Startup: controller logging to #{config.controller_log_file}"
       end
       

@@ -93,6 +93,7 @@ module Sonar
           begin
             self.action
             save_state
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_OK)
             sleep repeat_delay
             
           rescue ThreadTerminator
@@ -103,6 +104,7 @@ module Sonar
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_ERROR)
             sleep 5
             retry
           end

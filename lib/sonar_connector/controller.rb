@@ -21,6 +21,10 @@ module Sonar
       # instance of Sonar::Connector::Config
       attr_reader :config
       
+      ## 
+      # instance of Sonar::Connector::Status
+      attr_reader :status
+      
       ##
       # controller logger
       attr_reader :log
@@ -29,7 +33,6 @@ module Sonar
       # array of threads
       attr_reader :threads
       
-
       ##
       # Parse the config file and create instances of each connector, 
       # parsing their config in turn.
@@ -37,6 +40,11 @@ module Sonar
         @config = Sonar::Connector::Config.load config_filename
         @connectors = @config.connectors
         @consumer = Sonar::Connector::Consumer.new(@config)
+        
+        # uuuugly
+        @status = Sonar::Connector::Status.new(@config)
+        Sonar::Connector.const_set("STATUS", @status)
+        
         @threads = []
         
         @queue = Queue.new
@@ -52,7 +60,7 @@ module Sonar
       end
       
       ##
-      # Main connector loop. Fire up one thread per connector, 
+      # Main framework loop. Fire up one thread per connector, 
       # plus the message queue consumer. Then wait for quit signal.
       def start
         create_startup_dirs_and_files
@@ -118,5 +126,3 @@ module Sonar
     end
   end
 end
-
-

@@ -19,9 +19,11 @@ module Sonar
       end
       
       def switch_to_log_file
-        @log = Logger.new(base_config.controller_log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
+        @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
       end
       
+      ##
+      # Main loop to watch the command queue and process commands.
       def watch(queue)
         switch_to_log_file
         

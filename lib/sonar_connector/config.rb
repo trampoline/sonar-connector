@@ -9,6 +9,7 @@ module Sonar
       attr_reader :log_dir
       attr_reader :connectors_dir
       attr_reader :controller_log_file
+      attr_reader :status_file
       attr_reader :connectors
       attr_reader :email_settings
       
@@ -41,6 +42,7 @@ module Sonar
         @log_dir = File.join @base_dir, 'log'
         @connectors_dir = File.join @base_dir, 'var'
         @controller_log_file = File.join @log_dir, 'controller.log'
+        @status_file = File.join @base_dir, 'status.yml'
         @log_level = parse_log_level @raw_config["log_level"]
         @log_file_max_size = parse_log_file_max_size @raw_config["log_file_max_size"]
         @log_files_to_keep = parse_log_files_to_keep @raw_config["log_files_to_keep"]

@@ -7,7 +7,7 @@ module Sonar
     class Command
       
       def initialize(proc)
-        @proc=proc
+        @proc = proc
       end
 
       def execute

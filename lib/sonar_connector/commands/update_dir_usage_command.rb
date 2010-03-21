@@ -1,6 +1,6 @@
 module Sonar
   module Connector
-    class StatusCommand < Sonar::Connector::Command
+    class UpdateDirUsageCommand < Sonar::Connector::Command
       def initialize(connector)
         l = lambda do
         end

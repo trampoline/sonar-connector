@@ -94,6 +94,7 @@ module Sonar
             self.action
             save_state
             queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_OK)
+            queue << Sonar::Connector::UpdateDiskUsageCommand.new(self)
             sleep repeat_delay
             
           rescue ThreadTerminator

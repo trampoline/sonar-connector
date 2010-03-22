@@ -5,9 +5,9 @@ module Sonar
     CONNECTOR_ERROR = 'error'
     
     class UpdateStatusCommand < Sonar::Connector::Command
-      def initialize(connector, status)
+      def initialize(connector, msg)
         l = lambda do
-          Sonar::Connector::STATUS.set(connector.name, 'status', status)
+          status.set connector.name, 'status', msg
         end
         super(l)
       end

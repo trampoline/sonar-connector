@@ -41,10 +41,6 @@ module Sonar
         @connectors = @config.connectors
         @consumer = Sonar::Connector::Consumer.new(@config)
         
-        # uuuugly
-        @status = Sonar::Connector::Status.new(@config)
-        Sonar::Connector.const_set("STATUS", @status)
-        
         @threads = []
         
         @queue = Queue.new

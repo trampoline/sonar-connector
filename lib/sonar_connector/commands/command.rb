@@ -10,8 +10,8 @@ module Sonar
         @proc = proc
       end
 
-      def execute
-        @proc.call
+      def execute(context)
+        context.instance_eval(&@proc)
       end
       
     end

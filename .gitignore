@@ -26,3 +26,5 @@ config/config.json
 .bundle
 sent_administrator_emails/*
 status.yml
+.yardoc/*
+doc/*

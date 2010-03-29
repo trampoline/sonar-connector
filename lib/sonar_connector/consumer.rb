@@ -46,8 +46,7 @@ module Sonar
       end
       
       def cleanup
-        # TODO: why does this not work? queue.size and queue.empty? seem to block if used here.
-        # log.warn "Consumer is shutting down and there are #{queue.size} unprocessed commands on the queue." unless queue.empty?
+        log.warn "Consumer is shutting down and there are #{queue.size} unprocessed commands on the queue." unless queue.empty?
         log.info "Shut down consumer"
         log.close
       end
@@ -59,8 +58,8 @@ module Sonar
         switch_to_log_file
         
         while run
+          command = queue.pop
           begin
-            command = queue.pop
             command.execute ExecutionContext.new(:log=>log, :status=>status)
           rescue ThreadTerminator
             @run = false

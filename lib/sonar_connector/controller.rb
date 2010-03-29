@@ -74,7 +74,7 @@ module Sonar
         
         cleanup = lambda do
           puts "\nGiving threads 10 seconds to shut down..."
-          threads.each{|t| t.raise(ThreadTerminator.new)}
+          threads.each{|t| t.raise(ThreadTerminator)}
           begin
             Timeout::timeout(10) { 
               threads.map(&:join)

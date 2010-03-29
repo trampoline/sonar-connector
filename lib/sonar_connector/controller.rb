@@ -72,12 +72,13 @@ module Sonar
         log.info "starting the message queue consumer"
         threads << Thread.new{ consumer.watch(queue) }
         
-        cleanup = lambda {
+        cleanup = lambda do
           puts "\nGiving threads 10 seconds to shut down..."
           threads.each{|t| t.raise(ThreadTerminator.new)}
           begin
             Timeout::timeout(10) { 
-              threads.map(&:join) }
+              threads.map(&:join)
+            }
           rescue Timeout::Error
             puts "...couldn't stop all threads cleanly."
             log.info "Could not cleanly terminate all threads."
@@ -91,10 +92,9 @@ module Sonar
           log.info "Terminated all threads cleanly."
           log.close
           exit(0)
-          
-        }
+        end
         
-        # let the controlling thread go into an endless sleep.
+        # let the controlling thread go into an endless sleep
         puts "Ctrl-C to stop."
         trap "SIGINT", cleanup
         endless_sleep

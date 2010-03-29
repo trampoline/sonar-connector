@@ -39,14 +39,13 @@ describe Sonar::Connector::Consumer do
       setup_valid_config_file
       @controller = Sonar::Connector::Controller.new(valid_config_filename)
       @consumer = Sonar::Connector::Consumer.new(@controller.config)
+      @kommand = new_command_class("DummyCommand")
       @queue = Queue.new
     end
     
     it "should execute items on the queue" do
-      kommand = new_command_class("DummyCommand")
-      
-      k1 = kommand.new("some message")
-      k2 = kommand.new("another message")
+      k1 = @kommand.new("some message")
+      k2 = @kommand.new("another message")
       
       mock(k1).execute(anything)
       mock(k2).execute(anything)
@@ -54,9 +53,56 @@ describe Sonar::Connector::Consumer do
       @queue << k1
       @queue << k2
       
-      Thread.new { @consumer.watch(@queue) }
-      # sleep(0.1)
+      # set up the run order
+      mock(@consumer) do
+        run(){true}
+        run(){true}
+        run(){false}
+      end
+      
+      @consumer.watch(@queue)
     end
+    
+    it "should handle uncaught exceptions thrown by a command" do
+      k1 = @kommand.new("some message")
+      k2 = @kommand.new("another message")
+      
+      mock(k1).execute(anything){
+        raise "command raised an uncaught exception"
+      }
+      mock(k2).execute(anything)
+      
+      @queue << k1
+      @queue << k2
+      
+      # set up the run order
+      mock(@consumer) do
+        run(){true}
+        run(){true}
+        run(){false}
+      end
+      
+      @consumer.watch(@queue)
+    end
+    
+    it "should terminate on ThreadTerminator exception" do
+      k1 = @kommand.new("some message")
+      k2 = @kommand.new("some other message - this will never get processed")
+      
+      mock(k1).execute(anything){
+        raise Sonar::Connector::ThreadTerminator.new
+      }
+      
+      dont_allow(k2).execute
+      
+      mock.proxy(@consumer).cleanup
+      
+      @queue << k1
+      @queue << k2
+      
+      @consumer.watch(@queue)
+    end
+    
   end
   
 end

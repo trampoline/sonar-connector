@@ -9,7 +9,7 @@ module Sonar
       def initialize(proc)
         @proc = proc
       end
-
+      
       def execute(context)
         context.instance_eval(&@proc)
       end

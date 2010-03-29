@@ -37,6 +37,8 @@ module Sonar
       end
       
       def switch_to_log_file
+        FileUtils.mkdir_p(base_config.log_dir) unless File.directory?(base_config.log_dir)
+        FileUtils.touch @log_file
         @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
       end
       

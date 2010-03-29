@@ -10,6 +10,8 @@ Spec::Runner.configure do |config|
   
   config.prepend_before(:each) do
     
+    # This dir gets wiped after every spec run, so please - pretty please - 
+    # don't change it to anything that you care about.
     def base_dir
       "/tmp/sonar-connector/"
     end
@@ -45,4 +47,15 @@ Spec::Runner.configure do |config|
     FileUtils.mkdir_p(base_dir)
   end
   
+end
+
+
+# Creates an anonmyous throw-away class of type=parent, with an additional
+# proc for defining methods on the class.
+def new_anon_class(parent, name="", &proc)
+  klass = Class.new(parent)  
+  mc = klass.instance_eval{ class << self ; self ; end }
+  mc.send(:define_method, :to_s) {name}
+  klass.class_eval(&proc) if proc
+  klass
 end

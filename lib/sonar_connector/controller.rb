@@ -84,8 +84,10 @@ module Sonar
             log.info "Could not cleanly terminate all threads."
             log.close
             exit(1)
+          rescue ThreadTerminator
+            # ignore it, since it's come from one of the recently-nuked threads.
           rescue Exception => e
-            # do nothing - don't care about exceptions from dying threads.
+            log.debug "Caught unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
           end
           
           puts "...exited cleanly."

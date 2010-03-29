@@ -46,7 +46,6 @@ module Sonar
       end
       
       def cleanup
-        log.warn "Consumer is shutting down and there are #{queue.size} unprocessed commands on the queue." unless queue.empty?
         log.info "Shut down consumer"
         log.close
       end
@@ -58,17 +57,17 @@ module Sonar
         switch_to_log_file
         
         while run
-          command = queue.pop
           begin
+            command = queue.pop
             command.execute ExecutionContext.new(:log=>log, :status=>status)
-          rescue ThreadTerminator
-            @run = false
+          rescue ThreadTerminator => e
             break
           rescue Exception => e
             log.error "Command #{command.class} raised an unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
           end
         end
         
+        @run = false
         cleanup
         true
       end

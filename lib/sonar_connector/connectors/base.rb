@@ -44,9 +44,11 @@ module Sonar
         
         @connector_dir = File.join(base_config.connectors_dir, @name)
         @state_file = File.join(@connector_dir, "state.yml")
-        @state = {}
         
+        # empty state hash which will get written to by parse, and then potentially over-written by load_state
+        @state = {}
         parse connector_config
+        load_state
       end
       
       ##
@@ -57,19 +59,15 @@ module Sonar
       end
       
       ## 
-      # Load @state variable from the YAML state file
+      # Load state variables from the YAML state file
       def load_state
-        if File.exists? @state_file
-          @state = YAML.load_file @state_file
+        if File.exist? @state_file
+          @state.merge!(YAML.load_file @state_file)
           raise "State file did not contain a serialised hash." unless @state.is_a?(Hash)
           log.info "Loaded state file #{@state_file}"
-        else
-          save_state
-          log.info "Created new state file #{@state_file}"
         end
       rescue Exception => e
-        @state = {}
-        log.error "Error loading #{@state_file} so it was ignored and the internal connector state was reset. Original error: #{e.message}"
+        log.error "Error loading #{@state_file} so it was ignored and the internal connector state was reset. Original error: #{e.message}\n" + e.backtrace.join("\n")
       end
       
       ##
@@ -87,7 +85,6 @@ module Sonar
         
         FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
         switch_to_log_file
-        load_state
         
         while true
           begin

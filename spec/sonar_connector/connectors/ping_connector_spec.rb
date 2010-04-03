@@ -28,9 +28,16 @@ describe Sonar::Connector::PingConnector do
       @connector.retry_count.should == 4
     end
     
-    it "should set consecutive_errors unless its set already" do
-      pending
+    it "should set consecutive_errors unless if its not set already" do
       @connector = Sonar::Connector::PingConnector.new(@config, @base_config)
+      @connector.state[:consecutive_errors].should == 0
+    end
+    
+    it "should not set consecutive_errors if it's already in state" do
+      mock(File).exist?(is_a String){true}
+      mock(YAML).load_file(is_a String){ {:consecutive_errors=> 5} }
+      @connector = Sonar::Connector::PingConnector.new(@config, @base_config)
+      @connector.state[:consecutive_errors].should == 5
     end
   end
   

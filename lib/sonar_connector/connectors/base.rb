@@ -92,7 +92,7 @@ module Sonar
             save_state
             queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_OK)
             queue << Sonar::Connector::UpdateDiskUsageCommand.new(self)
-            sleep repeat_delay
+            sleep_for repeat_delay
             
           rescue ThreadTerminator
             log.info "Shut down connector"
@@ -103,7 +103,7 @@ module Sonar
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
             queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_ERROR)
-            sleep 5
+            sleep_for 5
             retry
           end
         end
@@ -118,6 +118,10 @@ module Sonar
       private
       
       attr_reader :raw_connector_config, :state_file, :base_config
+      
+      def sleep_for(seconds=0)
+        sleep seconds
+      end
       
     end
   end

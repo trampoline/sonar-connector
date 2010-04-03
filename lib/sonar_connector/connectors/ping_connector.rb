@@ -35,7 +35,7 @@ module Sonar
           state[:consecutive_errors] += 1
           if state[:consecutive_errors] == retry_count
             state[:consecutive_errors] = 0
-            queue << Sonar::Connector::EmailCommand.new(self, "tried to ping #{host} but failed to reach it #{retry_count} times")
+            queue.push Sonar::Connector::SendAdminEmailCommand.new(self, "tried to ping #{host} but failed to reach it #{retry_count} times")
           end
         end
       end

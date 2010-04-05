@@ -51,7 +51,7 @@ end
 
 
 # Creates an anonmyous throw-away class of type=parent, with an additional
-# proc for defining methods on the class.
+# proc for defining methods on the class. Tnx @mccraigmccraig :-)
 def new_anon_class(parent, name="", &proc)
   klass = Class.new(parent)  
   mc = klass.instance_eval{ class << self ; self ; end }

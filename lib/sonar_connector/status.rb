@@ -28,6 +28,10 @@ module Sonar
       def [](group)
         status[group]
       end
+
+      def []=(group, hash)
+        status[group] = hash
+      end
       
       private
       

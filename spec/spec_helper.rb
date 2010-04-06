@@ -25,8 +25,9 @@ Spec::Runner.configure do |config|
         "log_level" => "warn",
         "base_dir" => base_dir,
         "email_settings" => {
-          "admin_recipients" => ["originalpete@gmail.com"],
-          "perform_deliveries" => false,
+          "admin_sender" => "noreply@example.local",
+          "admin_recipients" => ["admin@example.local"],
+          "perform_deliveries" => true,
           "delivery_method" => "test",
           "raise_delivery_errors" => true,
           "save_emails_to_disk" => false

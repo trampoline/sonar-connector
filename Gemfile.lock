@@ -64,7 +64,7 @@ specs:
 - jeweler: 
     version: 1.4.0
 - actionmailer_extensions: 
-    version: 0.2.0
+    version: 0.4.0
 hash: c616bab9012c386432c501c32a586c1899c08c8a
 sources: 
 - Rubygems: 

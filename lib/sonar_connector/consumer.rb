@@ -60,7 +60,7 @@ module Sonar
           begin
             command = queue.pop
             command.execute ExecutionContext.new(:log=>log, :status=>status)
-          rescue ThreadTerminator => e
+          rescue ThreadTerminator
             break
           rescue Exception => e
             log.error "Command #{command.class} raised an unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")

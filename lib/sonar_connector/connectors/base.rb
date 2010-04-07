@@ -26,6 +26,10 @@ module Sonar
       # central command queue for sending messages back to the controller
       attr_reader :queue
       
+      ##
+      # run loop flag
+      attr_reader :run
+      
       def initialize(connector_config, base_config)
         @base_config = base_config
         @raw_connector_config = connector_config
@@ -49,6 +53,8 @@ module Sonar
         @state = {}
         parse connector_config
         load_state
+        
+        @run = true
       end
       
       ##
@@ -86,15 +92,20 @@ module Sonar
       end
       
       ##
+      # Cleanup routine after connector shutdown
+      def cleanup
+        log.info "Shut down connector"
+        log.close
+      end
+      
+      ##
       # the main run loop that every connector executes indefinitely 
       # until Thread.raise is called on this instance.
-      def run(queue)
+      def start(queue)
         @queue = queue
-        
-        make_dir
         switch_to_log_file
         
-        while true
+        while run
           begin
             self.action
             save_state
@@ -103,19 +114,19 @@ module Sonar
             sleep_for repeat_delay
             
           rescue ThreadTerminator
-            log.info "Shut down connector"
-            log.close
-            return true
+            break
             
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
             queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_ERROR)
             sleep_for 5
-            retry
           end
         end
         
+        @run = false
+        cleanup
+        true
       end
       
       ##

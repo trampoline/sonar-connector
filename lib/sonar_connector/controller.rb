@@ -66,7 +66,7 @@ module Sonar
         # fire up the connector threads
         connectors.each do |connector|
           log.info "starting connector '#{connector.name}'"
-          threads << Thread.new { connector.run(queue) }
+          threads << Thread.new { connector.start(queue) }
         end
         
         log.info "starting the message queue consumer"

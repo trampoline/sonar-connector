@@ -5,7 +5,7 @@ describe Sonar::Connector::Base do
     setup_valid_config_file
     @base_config = Sonar::Connector::Config.load(valid_config_filename)
     @connector_klass = new_anon_class(Sonar::Connector::Base, "MyConnector") {}
-    @config = {'name'=>'foo', 'repeat_delay'=> 10}
+    @config = {'type'=>'my_connector', 'name'=>'foo', 'repeat_delay'=> 10}
     @connector = @connector_klass.new(@config, @base_config)
   end
   
@@ -105,6 +105,88 @@ describe Sonar::Connector::Base do
       @connector.load_state
       @connector.state[:foo].should == :bar
     end
+  end
+  
+  describe "start" do
+    before do
+      @connector = new_anon_class(Sonar::Connector::Base, "MyConnector"){
+        def action
+          true
+        end
+      }.new(@config, @base_config)
+      @queue = Queue.new
+      stub(@connector).sleep_for(anything)
+      
+      # don't switch to log file, but don't close stdout either
+      mock(@connector).switch_to_log_file
+      mock(@connector.log).close
+    end
+    
+    it "should peform the action once per iteration" do
+      mock(@connector) do
+        run(){true}
+        run(){true}
+        run(){false}
+      end
+      
+      mock(@connector).action.times(2)
+      
+      @connector.start(@queue)
+    end
+    
+    it "should catch uncaught exceptions from the action" do
+      mock(@connector) do
+        run(){true}
+        run(){true}
+        run(){false}
+      end
+      
+      mock(@connector) do
+        action(){raise "uncaught exception"}
+        action(){true}
+      end
+      
+      @connector.start(@queue)
+    end
+    
+    it "should terminate on ThreadTerminator exception" do
+      stub(@connector).run{true}
+      mock(@connector).action(){raise Sonar::Connector::ThreadTerminator.new}
+      @connector.start(@queue)
+    end
+    
+    it "should queue status update and disk usage commands on successful action" do
+      mock(@connector) do
+        run(){true}
+        run(){true}
+        run(){false}
+      end
+      
+      command = Object.new
+      mock(Sonar::Connector::UpdateStatusCommand).new(anything, Sonar::Connector::CONNECTOR_OK).times(2){command}
+      mock(@queue, :<<).with(command).times(2)
+      
+      mock(@queue, :<<).with(is_a Sonar::Connector::UpdateDiskUsageCommand).times(2)
+      
+      @connector.start(@queue)
+    end
+    
+    it "should queue error status update on unhandled action error" do
+      mock(@connector) do
+        run(){true}
+        run(){false}
+      end
+      
+      mock(@connector) do
+        action(){raise "uncaught exception"}
+      end
+      
+      command = Object.new
+      mock(Sonar::Connector::UpdateStatusCommand).new(anything, Sonar::Connector::CONNECTOR_ERROR).times(1){command}
+      mock(@queue, :<<).with(command).times(1)
+      @connector.start(@queue)
+    end
+    
   end
   
 end

@@ -16,6 +16,8 @@ Spec::Runner.configure do |config|
       "/tmp/sonar-connector/"
     end
     
+    # Note this path doesn't have to be real - it's just used to intercept calls 
+    # to the stubbed read_json_file method on Config
     def valid_config_filename
       "path to a valid config file"
     end

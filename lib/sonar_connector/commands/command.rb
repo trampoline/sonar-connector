@@ -6,6 +6,8 @@ module Sonar
     
     class Command
       
+      attr_accessor :proc
+      
       def initialize(proc)
         @proc = proc
       end

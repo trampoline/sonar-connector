@@ -62,6 +62,17 @@ describe Sonar::Connector::Status do
       @status.set("group", "key", "value")
       @status["group"]["key"].should == "value"
     end
+    
+    it "should update the timestamp" do
+      now = Time.now
+      stub(Time).now{now}
+      @status.set("group", "key", "value")
+      @status["group"]["last_updated"] = nil
+      @status["group"]["last_updated"].should be_nil
+      
+      @status.set("group", "key", "value")
+      @status["group"]["last_updated"].should == now.to_s
+    end
   end
     
 end

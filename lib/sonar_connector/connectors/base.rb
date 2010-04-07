@@ -59,22 +59,30 @@ module Sonar
       end
       
       ## 
-      # Load state variables from the YAML state file
+      # Load the state hash from YAML file
       def load_state
-        if File.exist? @state_file
-          @state.merge!(YAML.load_file @state_file)
-          raise "State file did not contain a serialised hash." unless @state.is_a?(Hash)
-          log.info "Loaded state file #{@state_file}"
-        end
-      rescue Exception => e
-        log.error "Error loading #{@state_file} so it was ignored and the internal connector state was reset. Original error: #{e.message}\n" + e.backtrace.join("\n")
+        @state.merge! read_state
       end
       
+      
       ##
-      # Save the @state to a YAML file
+      # Read state file
+      def read_state
+        s = {}
+        s = YAML.load_file state_file if File.exist?(state_file)
+        raise "State file did not contain a serialised hash." unless s.is_a?(Hash)
+      rescue Exception => e
+        log.error "Error loading #{state_file} so it was ignored. Original error: #{e.message}\n" + e.backtrace.join("\n")
+      ensure 
+        return s
+      end
+      
+      
+      ##
+      # Save the state hash to a YAML file
       def save_state
-        File.open(@state_file, "w"){|f| f << state.to_yaml }
-        log.info "saved state to #{@state_file}"
+        make_dir
+        File.open(state_file, "w"){|f| f << state.to_yaml }
       end
       
       ##
@@ -83,7 +91,7 @@ module Sonar
       def run(queue)
         @queue = queue
         
-        FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
+        make_dir
         switch_to_log_file
         
         while true
@@ -113,6 +121,7 @@ module Sonar
       ##
       # Connector subclasses can overload the parse method.
       def parse(config)
+        log.warn "Method #parse called on connector base class. Connector #{name} should define #parse method."
       end
       
       private
@@ -121,6 +130,10 @@ module Sonar
       
       def sleep_for(seconds=0)
         sleep seconds
+      end
+      
+      def make_dir
+        FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
       end
       
     end

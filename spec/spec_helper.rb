@@ -24,7 +24,7 @@ Spec::Runner.configure do |config|
     
     def setup_valid_config_file
       @config_options = {
-        "log_level" => "warn",
+        "log_level" => "fatal",
         "base_dir" => base_dir,
         "email_settings" => {
           "admin_sender" => "noreply@example.local",

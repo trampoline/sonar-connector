@@ -1,4 +1,4 @@
-source :gemcutter
+source :rubygems
 
 group :default do
   gem "activesupport"

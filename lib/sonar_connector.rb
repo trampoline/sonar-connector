@@ -4,19 +4,12 @@ module Sonar
   end
 end
 
-ENV['BUNDLE_GEMFILE'] ||= File.join(Sonar::Connector::ROOT, '..', 'Gemfile')
-
-begin
-  # Try to require the preresolved locked set of gems.
-  require File.expand_path('../.bundle/environment', __FILE__)
-rescue LoadError
-  # Fall back on doing an unlocked resolve at runtime.
-  require "rubygems"
-  require "bundler"
-  Bundler.setup
-end
-
+# Load Bundler
 require 'rubygems'
+require 'bundler'
+Bundler.setup
+
+# Load external deps
 require 'active_support'
 require 'json'
 require 'yaml'
@@ -25,7 +18,8 @@ require 'logger'
 require 'action_mailer'
 require 'actionmailer_extensions'
 
-class_files = %W(
+# Load internal classes
+%W(
   controller
   config
   status
@@ -39,8 +33,6 @@ class_files = %W(
   commands/update_status_command
   commands/send_admin_email_command
   commands/update_disk_usage_command
-)
-
-class_files.each do |file|
+).each do |file|
   require File.expand_path File.join(Sonar::Connector::ROOT, 'sonar_connector', file)
 end

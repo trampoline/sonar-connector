@@ -1,5 +1,10 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+require 'rubygems'
+require 'bundler'
+Bundler.setup(:default, :test)
+
 require 'sonar_connector'
 require 'spec'
 require 'spec/autorun'

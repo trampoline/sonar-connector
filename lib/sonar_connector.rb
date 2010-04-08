@@ -29,6 +29,7 @@ class_files = %W(
   status
   consumer
   emailer
+  utils
   connectors/base
   connectors/dummy_connector
   connectors/ping_connector

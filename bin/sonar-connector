@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'sonar_connector')
 require 'optparse'
-require 'sonar_connector'
 
+puts "pwd: #{Dir.pwd}"
 config_filename = File.expand_path File.join(File.dirname(__FILE__), "..", "config", "config.json")
 
 ARGV.options do |opts|
@@ -24,6 +24,11 @@ ARGV.options do |opts|
     exit
   }
   
+  opts.on("--console", String, "Run IRB console in connector framework environment") {
+    lib_path = File.expand_path File.join(File.dirname(__FILE__), '..', 'lib')
+    Kernel.system "irb -rubygems -I #{lib_path} -r sonar_connector.rb"
+    exit
+  }
   opts.on_tail("-v", "--version", "Show version") {
     version_file = File.join File.expand_path(File.dirname(__FILE__)), "..", "VERSION"
     puts "SONAR Connector Framework #{File.read(version_file)}"

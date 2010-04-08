@@ -1,3 +1,9 @@
+module Sonar
+  module Connector
+    ROOT = File.dirname(__FILE__)
+  end
+end
+
 begin
   # Try to require the preresolved locked set of gems.
   require File.expand_path('../.bundle/environment', __FILE__)
@@ -17,16 +23,21 @@ require 'logger'
 require 'action_mailer'
 require 'actionmailer_extensions'
 
-require 'sonar_connector/controller'
-require 'sonar_connector/config'
-require 'sonar_connector/status'
-require 'sonar_connector/consumer'
-require 'sonar_connector/emailer'
-require 'sonar_connector/connectors/base'
-require 'sonar_connector/connectors/dummy_connector'
-require 'sonar_connector/connectors/ping_connector'
-require 'sonar_connector/commands/command'
-require 'sonar_connector/commands/update_status_command'
-require 'sonar_connector/commands/send_admin_email_command'
-require 'sonar_connector/commands/update_disk_usage_command'
-require 'sonar_connector/utils'
+class_files = %W(
+  controller
+  config
+  status
+  consumer
+  emailer
+  connectors/base
+  connectors/dummy_connector
+  connectors/ping_connector
+  commands/command
+  commands/update_status_command
+  commands/send_admin_email_command
+  commands/update_disk_usage_command
+)
+
+class_files.each do |file|
+  require File.expand_path File.join(Sonar::Connector::ROOT, 'sonar_connector', file)
+end

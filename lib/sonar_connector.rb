@@ -4,6 +4,8 @@ module Sonar
   end
 end
 
+ENV['BUNDLE_GEMFILE'] ||= File.join(Sonar::Connector::ROOT, '..', 'Gemfile')
+
 begin
   # Try to require the preresolved locked set of gems.
   require File.expand_path('../.bundle/environment', __FILE__)

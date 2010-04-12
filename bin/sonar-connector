@@ -45,11 +45,7 @@ ARGV.options do |opts|
     puts "SONAR Connector Framework #{File.read(version_file)}"
     exit
   }
-  
-  opts.on_tail("-h", "--help", "Show this message") {
-    puts opts
-    exit
-  }
+  opts.on_tail("-h", "--help", "Show this message") {}
   opts.parse!
 end
 

@@ -23,7 +23,7 @@ begin
     
     gem.add_dependency "activesupport", ">= 2.3.5"
     gem.add_dependency "actionmailer", ">= 2.3.5"
-    gem.add_dependency "actionmailer_extensions", ">= 0.2.0"
+    gem.add_dependency "actionmailer_extensions", ">= 0.4.0"
     gem.add_dependency "json_pure", ">= 1.2.2"
     gem.add_dependency "net-ping", ">= 1.3.2"
     

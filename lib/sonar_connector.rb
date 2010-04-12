@@ -6,8 +6,6 @@ end
 
 # Load Bundler
 require 'rubygems'
-require 'bundler'
-Bundler.setup
 
 # Load external deps
 require 'active_support'

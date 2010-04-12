@@ -3,8 +3,7 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'sonar_connector')
 require 'optparse'
 
-puts "pwd: #{Dir.pwd}"
-config_filename = File.expand_path File.join(File.dirname(__FILE__), "..", "config", "config.json")
+config_filename = File.expand_path File.join(Dir.pwd, "config", "config.json")
 
 ARGV.options do |opts|
   script_name = File.basename($0)
@@ -12,19 +11,31 @@ ARGV.options do |opts|
   opts.banner = "Usage: #{script_name} OPTION"
   opts.separator "Specific options:"
   
-  opts.on("--start", String, "Start the connector") {
+  opts.on("--start", "Start the connector") {
     puts "Bootstrapping the connector framework from config file #{config_filename}. Check logs for details."
     Sonar::Connector::Controller.new(config_filename).start
     exit
   }
-  opts.on("--check", String, "Validate the connector config") {
+  opts.on("--check", "Validate the connector config") {
     puts "Checking config in #{config_filename}:"
     Sonar::Connector::Controller.new(config_filename)
     puts "...clean."
     exit
+  } 
+  opts.on("-i", "--install=PATH", String, "Install the connector working dir and default config to the file system") {|p|
+    path = File.expand_path p
+    
+    if File.directory?(path)
+      puts "Error: Directory '#{path}' already exists, aborting."
+      exit(1)
+    end
+    
+    %W{config log var}.each {|dir| FileUtils.mkdir_p File.join(path, dir)}
+    FileUtils.cp config_filename, File.join(path, 'config', 'config.json')
+    puts "Success: Set up working directory '#{path}' and associated subdirs."
+    exit
   }
-  
-  opts.on("--console", String, "Run IRB console in connector framework environment") {
+  opts.on("--console", "Run IRB console in connector framework environment") {
     lib_path = File.expand_path File.join(File.dirname(__FILE__), '..', 'lib')
     Kernel.system "irb -rubygems -I #{lib_path} -r sonar_connector.rb"
     exit

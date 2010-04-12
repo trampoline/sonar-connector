@@ -1,13 +1,3 @@
-begin
-  # Try to require the preresolved locked set of gems.
-  require File.expand_path('../.bundle/environment', __FILE__)
-rescue LoadError
-  # Fall back on doing an unlocked resolve at runtime.
-  require "rubygems"
-  require "bundler"
-  Bundler.setup
-end
-
 require 'rubygems'
 require 'rake'
 
@@ -15,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "sonar_connector"
-    gem.summary = %Q{A behind-the-firewall connector for Trampoline SONAR }
-    gem.description = %Q{Framework that allows arbitrary push and pull connectors to send data to an instance of the Trampoline SONAR server }
+    gem.summary = %Q{A behind-the-firewall connector for Trampoline SONAR}
+    gem.description = %Q{Framework that allows arbitrary push and pull connectors to send data to an instance of the Trampoline SONAR server}
     gem.email = "peter.macrobert@empire42.com"
     gem.homepage = "http://github.com/trampoline/sonar-connector"
     gem.authors = ["Peter MacRobert", "Mark Meyer"]

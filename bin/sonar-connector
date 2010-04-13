@@ -31,7 +31,7 @@ ARGV.options do |opts|
     end
     
     %W{config log var}.each {|dir| FileUtils.mkdir_p File.join(path, dir)}
-    FileUtils.cp File.join(Sonar::Connector::ROOT, "config", "config.example.json"), File.join(path, 'config', 'config.json')
+    FileUtils.cp File.join(Sonar::Connector::ROOT, '..', "config", "config.example.json"), File.join(path, 'config', 'config.json')
     puts "Success: Set up working directory '#{path}' and associated subdirs."
     exit
   }

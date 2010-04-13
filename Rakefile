@@ -7,7 +7,7 @@ begin
     gem.name = "sonar_connector"
     gem.summary = %Q{A behind-the-firewall connector for Trampoline SONAR}
     gem.description = %Q{Framework that allows arbitrary push and pull connectors to send data to an instance of the Trampoline SONAR server}
-    gem.email = "peter.macrobert@empire42.com"
+    gem.email = "hello@empire42.com"
     gem.homepage = "http://github.com/trampoline/sonar-connector"
     gem.authors = ["Peter MacRobert", "Mark Meyer"]
     

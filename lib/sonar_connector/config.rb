@@ -112,16 +112,18 @@ module Sonar
       end
       
       def parse_connector(config)
-        # first see if this class is already loaded
         
+        # Load the require first, if specified
         begin
           require config["require"] unless config["require"].blank?
-        rescue
-          raise InvalidConfig.new("Error with parameter 'require' in connector settings '#{config.inspect}': require failed.")
+        rescue MissingSourceFile
+          raise InvalidConfig.new("Error with parameter 'require' in connector settings '#{config.inspect}': require failed - check that the path is correct.")
         end
         
+        # Insist that class is specified
         raise InvalidConfig.new("Error with parameter 'class' in connector settings '#{config.inspect}': class must be specified.") if config["class"].blank?
         
+        # Attempt to load the class definition
         begin
           klass = config["class"].constantize
         rescue

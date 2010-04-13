@@ -43,6 +43,7 @@
   "connectors": [
     {
       "class": "Sonar::Connector::DummyConnector",
+      "require": "bogus/path",
       "name": "dummy_connector1",
       "repeat_delay": 10
     },

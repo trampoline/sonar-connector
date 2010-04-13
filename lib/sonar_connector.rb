@@ -1,6 +1,6 @@
 module Sonar
   module Connector
-    ROOT = File.dirname(__FILE__)
+    ROOT = File.dirname(__FILE__) unless Sonar::Connector.const_defined?("ROOT")
   end
 end
 

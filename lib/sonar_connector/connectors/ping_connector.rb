@@ -7,7 +7,7 @@ module Sonar
     # A useful connector that pings a server regularly and logs an error when it can't ping. 
     # Use the following connector JSON config:
     # {
-    #   "type": "ping_connector",
+    #   "class": "Sonar::Connector::PingConnector",
     #   "name": "ping_connector1",
     #   "repeat_delay": 60,
     #   "host": "www.google.com"

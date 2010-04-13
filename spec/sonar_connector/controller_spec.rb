@@ -25,8 +25,8 @@ describe Sonar::Connector::Controller do
       
       # Add another connector so we have two in total
       @config_options["connectors"] << {
-        "name" => "dummy_connector_2",
-        "type" => "dummy_connector",
+        "class" => "Sonar::Connector::DummyConnector",
+        "name" => "dummy2",
         "repeat_delay" => 10
       }
       

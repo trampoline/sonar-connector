@@ -36,17 +36,18 @@
   
   /* 
     Specific configuration for each connector. Each connector must have 
-    a type and a unique name. Note that each connector type may have further configuration options
-    that are specific to the connector type.
+    a class and a unique name. The require load path can also be specified if necessary.
+    Note that each connector type may have further configuration options
+    that are specific to the connector class.
   */
   "connectors": [
     {
-      "type": "dummy_connector",
+      "class": "Sonar::Connector::DummyConnector",
       "name": "dummy_connector1",
       "repeat_delay": 10
     },
     {
-      "type": "ping_connector",
+      "class": "Sonar::Connector::PingConnector",
       "name": "ping_connector1",
       "repeat_delay": 60,
       "host": "www.google.com"

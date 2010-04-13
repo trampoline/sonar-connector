@@ -38,8 +38,8 @@ Spec::Runner.configure do |config|
         },
         
         "connectors" => [
-          "name" => "dummy_connector_1",
-          "type" => "dummy_connector",
+          "class" => "Sonar::Connector::DummyConnector",
+          "name" => "dummy1",
           "repeat_delay" => 10
         ]
       }

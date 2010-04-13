@@ -37,7 +37,7 @@ module Sonar
         @name = connector_config["name"]
         
         # Create STDOUT logger and inherit the logger settings from the base controller config
-        @log_file = File.join(base_config.log_dir, "#{connector_config["type"]}_#{@name}.log")
+        @log_file = File.join(base_config.log_dir, "connector_#{@name}.log")
         @log = Logger.new(STDOUT)
         @log.level = base_config.log_level
         

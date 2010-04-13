@@ -113,22 +113,20 @@ module Sonar
       
       def parse_connector(config)
         # first see if this class is already loaded
-        type = config["type"]
-        raise InvalidConfig.new("Error with connector settings '#{config.inspect}': parameter 'type' must be specified") if type.blank?
         
-        klass = type.camelize.constantize rescue nil
-        
-        # try in the Sonar::Connector module space
-        klass = ("sonar/connector/"+type).camelize.constantize rescue nil
-        
-        # try again with require
-        unless klass
-          require type rescue nil
-          klass = type.camelize.constantize rescue nil
+        begin
+          require config["require"] unless config["require"].blank?
+        rescue
+          raise InvalidConfig.new("Error with parameter 'require' in connector settings '#{config.inspect}': require failed.")
         end
         
-        # give up if it still doesn't exist
-        raise InvalidConfig.new("Error with connector '#{type}': could not find a class for it called #{type.camelize}") unless klass
+        raise InvalidConfig.new("Error with parameter 'class' in connector settings '#{config.inspect}': class must be specified.") if config["class"].blank?
+        
+        begin
+          klass = config["class"].constantize
+        rescue
+          raise InvalidConfig.new("Error with parameter 'class' in connector settings '#{config.inspect}': could not load class.")
+        end
         
         # sanity-check that the connector class subclasses the base
         raise InvalidConfig.new("Connector class #{klass.name} must subclass Sonar::Connector::Base") unless klass.ancestors.include?(Sonar::Connector::Base)

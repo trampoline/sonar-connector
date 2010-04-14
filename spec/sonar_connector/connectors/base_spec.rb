@@ -5,7 +5,7 @@ describe Sonar::Connector::Base do
     setup_valid_config_file
     @base_config = Sonar::Connector::Config.load(valid_config_filename)
     @connector_klass = new_anon_class(Sonar::Connector::Base, "MyConnector") {}
-    @config = {'type'=>'my_connector', 'name'=>'foo', 'repeat_delay'=> 10}
+    @config = {'class'=>'MyConnector', 'name'=>'foo', 'repeat_delay'=> 10}
     @connector = @connector_klass.new(@config, @base_config)
   end
   

@@ -51,6 +51,8 @@ module Sonar
         # extract each connector, locate its class and attempt to parse its config
         @connectors = parse_connectors @raw_config["connectors"]
         
+        associate_connector_dependencies! @connectors
+        
         self
       rescue JSON::ParserError => e
         raise InvalidConfig.new("Config file #{config_file} is not in a valid JSON format. Please check the contents carefully. This is the exact error: \n#{e.message}")
@@ -138,6 +140,19 @@ module Sonar
       def symbolise_hash_keys(hash)
         return nil unless hash
         hash.keys.inject({}){|acc, k| acc[k.to_sym] = hash[k]; acc}
+      end
+      
+      # Find all connectors with "source_connector" specified in config, and map these 
+      # associations to the connector instances.
+      def associate_connector_dependencies!(connectors)
+        connectors.each do |connector|
+          source_name = connector.raw_config["source_connector"]
+          next if source_name.blank?
+          c = connectors.select{|connector| connector.name == source_name}.first
+          raise InvalidConfig.new("Connector '#{connector.name}' references source_connector '#{source_name}' but no such connector name is defined.") unless c
+          raise InvalidConfig.new("Connector '#{connector.name}' cannot have itself as a source_connector.") if c == connector
+          connector.source_connector = c
+        end
       end
       
     end

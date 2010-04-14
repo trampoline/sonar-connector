@@ -2,37 +2,36 @@ module Sonar
   module Connector
     class Base
       
-      ##
       # every connector has a unique name
       attr_reader :name
       
-      ##
+      # Connector-specific config hash
+      attr_reader :raw_config
+      
       # each connector instance has a working dir for its state and files
       attr_reader :connector_dir
       
-      ##
       # logger instance
       attr_reader :log
       
-      ##
       # state hash that is serialized and persisted to disk every cycle of the run loop
       attr_reader :state
       
-      ##
       # repeat delay which is waited out on each cycle of the run loop
       attr_reader :repeat_delay
       
-      ##
       # central command queue for sending messages back to the controller
       attr_reader :queue
       
-      ##
       # run loop flag
       attr_reader :run
       
+      # Associated connector that provides source data via the file system
+      attr_accessor :source_connector
+      
       def initialize(connector_config, base_config)
         @base_config = base_config
-        @raw_connector_config = connector_config
+        @raw_config = connector_config
         
         @name = connector_config["name"]
         
@@ -57,21 +56,18 @@ module Sonar
         @run = true
       end
       
-      ##
       # Logging defaults to use STDOUT. After initialization we need to switch the 
       # logger to use an output file.
       def switch_to_log_file
         @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
       end
       
-      ## 
       # Load the state hash from YAML file
       def load_state
         @state.merge! read_state
       end
       
       
-      ##
       # Read state file
       def read_state
         s = {}
@@ -84,21 +80,18 @@ module Sonar
       end
       
       
-      ##
       # Save the state hash to a YAML file
       def save_state
         make_dir
         File.open(state_file, "w"){|f| f << state.to_yaml }
       end
       
-      ##
       # Cleanup routine after connector shutdown
       def cleanup
         log.info "Shut down connector"
         log.close
       end
       
-      ##
       # the main run loop that every connector executes indefinitely 
       # until Thread.raise is called on this instance.
       def start(queue)
@@ -129,7 +122,6 @@ module Sonar
         true
       end
       
-      ##
       # Connector subclasses can overload the parse method.
       def parse(config)
         log.warn "Method #parse called on connector base class. Connector #{name} should define #parse method."
@@ -137,7 +129,7 @@ module Sonar
       
       private
       
-      attr_reader :raw_connector_config, :state_file, :base_config
+      attr_reader :state_file, :base_config
       
       def sleep_for(seconds=0)
         sleep seconds

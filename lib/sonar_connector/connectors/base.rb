@@ -127,6 +127,11 @@ module Sonar
         log.warn "Method #parse called on connector base class. Connector #{name} should define #parse method."
       end
       
+      def to_s
+        "Connector '#{name}'"
+      end
+      alias :inspect :to_s
+      
       private
       
       attr_reader :state_file, :base_config

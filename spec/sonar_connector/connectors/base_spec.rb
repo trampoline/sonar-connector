@@ -163,7 +163,7 @@ describe Sonar::Connector::Base do
       end
       
       command = Object.new
-      mock(Sonar::Connector::UpdateStatusCommand).new(anything, Sonar::Connector::CONNECTOR_OK).times(2){command}
+      mock(Sonar::Connector::UpdateStatusCommand).new(anything, 'last_action', Sonar::Connector::ACTION_OK).times(2){command}
       mock(@queue, :<<).with(command).times(2)
       
       mock(@queue, :<<).with(is_a Sonar::Connector::UpdateDiskUsageCommand).times(2)
@@ -182,7 +182,7 @@ describe Sonar::Connector::Base do
       end
       
       command = Object.new
-      mock(Sonar::Connector::UpdateStatusCommand).new(anything, Sonar::Connector::CONNECTOR_ERROR).times(1){command}
+      mock(Sonar::Connector::UpdateStatusCommand).new(anything, 'last_action', Sonar::Connector::ACTION_FAILED).times(1){command}
       mock(@queue, :<<).with(command).times(1)
       @connector.start(@queue)
     end

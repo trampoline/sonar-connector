@@ -1,13 +1,13 @@
 module Sonar
   module Connector
     
-    CONNECTOR_OK = 'ok'
-    CONNECTOR_ERROR = 'error'
+    ACTION_OK = 'ok'
+    ACTION_FAILED = 'failed'
     
     class UpdateStatusCommand < Sonar::Connector::Command
-      def initialize(connector, msg)
+      def initialize(connector, field, value)
         l = lambda do
-          status.set connector.name, 'status', msg
+          status.set connector.name, field, value
         end
         super(l)
       end

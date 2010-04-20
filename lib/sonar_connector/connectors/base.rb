@@ -102,7 +102,7 @@ module Sonar
           begin
             self.action
             save_state
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_OK)
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'last_action', Sonar::Connector::ACTION_OK)
             queue << Sonar::Connector::UpdateDiskUsageCommand.new(self)
             sleep_for repeat_delay
             
@@ -112,7 +112,7 @@ module Sonar
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, Sonar::Connector::CONNECTOR_ERROR)
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'last_action', Sonar::Connector::ACTION_FAILED)
             sleep_for 5
           end
         end

@@ -15,6 +15,7 @@ require 'thread'
 require 'logger'
 require 'action_mailer'
 require 'actionmailer_extensions'
+require 'fileutils'
 
 # Load internal classes
 %W(

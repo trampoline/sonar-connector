@@ -14,6 +14,13 @@ module Sonar
       end
       
       module_function :du
+      
+      def timestamped_id(prefix=nil)
+        t = Time.now
+        [prefix, t.to_i * 1000000 + t.usec].compact.join("_")
+      end
+      
+      module_function :timestamped_id
     end
   end
 end

@@ -24,6 +24,7 @@ require 'fileutils'
   status
   consumer
   emailer
+  file_store
   utils
   connectors/base
   connectors/dummy_connector

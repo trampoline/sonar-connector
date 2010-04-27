@@ -112,10 +112,20 @@ module Sonar
         
         while run
           begin
+            log.info "beginning action"
             self.action
             save_state
+            log.info "finished action and saved state"
+            
+            log.info "working count: #{working.count}"
+            log.info "error count: #{error.count}"
+            log.info "complete count: #{complete.count}"
+            
             queue << Sonar::Connector::UpdateStatusCommand.new(self, 'last_action', Sonar::Connector::ACTION_OK)
             queue << Sonar::Connector::UpdateDiskUsageCommand.new(self)
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'working_count', working.count)
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'error_count', error.count)
+            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'complete_count', complete.count)
             sleep_for repeat_delay
             
           rescue ThreadTerminator

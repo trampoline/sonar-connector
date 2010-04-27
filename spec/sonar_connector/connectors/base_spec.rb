@@ -171,13 +171,15 @@ describe Sonar::Connector::Base do
         run(){false}
       end
       
-      command = Object.new
-      mock(Sonar::Connector::UpdateStatusCommand).new(anything, 'last_action', Sonar::Connector::ACTION_OK).times(2){command}
-      mock(@queue, :<<).with(command).times(2)
-      
-      mock(@queue, :<<).with(is_a Sonar::Connector::UpdateDiskUsageCommand).times(2)
+      stub(Sonar::Connector::UpdateStatusCommand).new
+      stub(Sonar::Connector::UpdateDiskUsageCommand).new
+      stub(@queue, :<<)
       
       @connector.start(@queue)
+      
+      Sonar::Connector::UpdateStatusCommand.should have_received.new(anything, 'last_action', Sonar::Connector::ACTION_OK).times(2)
+      Sonar::Connector::UpdateDiskUsageCommand.should have_received.new(anything).times(2)
+      @queue.should have_received(:<<).with(anything).times(10) # 5x commands queued on 2x action invocations
     end
     
     it "should queue error status update on unhandled action error" do

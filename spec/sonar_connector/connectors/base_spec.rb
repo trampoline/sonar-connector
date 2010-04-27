@@ -129,7 +129,6 @@ describe Sonar::Connector::Base do
       
       # don't switch to log file, but don't close stdout either
       mock(@connector).switch_to_log_file
-      mock(@connector.log).close
     end
     
     it "should peform the action once per iteration" do

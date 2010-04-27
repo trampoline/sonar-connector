@@ -101,8 +101,6 @@ module Sonar
       
       # Cleanup routine after connector shutdown
       def cleanup
-        log.info "Shut down connector"
-        log.close
       end
       
       # the main run loop that every connector executes indefinitely 

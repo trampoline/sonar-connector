@@ -15,13 +15,6 @@ module Sonar
       
       module_function :du
       
-      def timestamped_id(prefix=nil)
-        t = Time.now
-        [prefix, t.to_i * 1000000 + t.usec].compact.join("_")
-      end
-      
-      module_function :timestamped_id
-      
       def stdout_logger(base_config)
         log = Logger.new STDOUT
         log.level = base_config.log_level

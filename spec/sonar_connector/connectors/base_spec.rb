@@ -107,6 +107,16 @@ describe Sonar::Connector::Base do
     end
   end
   
+  describe "create_filestores" do
+    it "should create filestores for working, error and complete" do
+      stub(Sonar::Connector::FileStore).new
+      @connector.create_filestores
+      Sonar::Connector::FileStore.should have_received.new(File.join @connector.connector_dir, "working")
+      Sonar::Connector::FileStore.should have_received.new(File.join @connector.connector_dir, "error")
+      Sonar::Connector::FileStore.should have_received.new(File.join @connector.connector_dir, "complete")
+    end
+  end
+  
   describe "start" do
     before do
       @connector = new_anon_class(Sonar::Connector::Base, "MyConnector"){

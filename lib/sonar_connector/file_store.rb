@@ -43,7 +43,7 @@ module Sonar
       def new_filename(suffix = nil)
         uuid = UUIDTools::UUID.timestamp_create.to_i.to_s(UUID_RADIX).rjust(UUID_PAD_LENGTH, "0")
         dirname = File.join base_dir, *uuid.scan(/.{1,#{UUID_SLICE_LENGTH}}/)[0..DIR_DEPTH]
-        File.join dirname, [uuid, suffix].compact.join("_") + extension
+        File.join dirname, [uuid, Time.now.to_i, suffix].compact.join("_") + extension
       end
       
       def count

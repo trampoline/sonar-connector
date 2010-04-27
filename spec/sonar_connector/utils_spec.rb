@@ -47,20 +47,16 @@ describe Sonar::Connector::Utils do
     end
   end
   
-  describe "timestamped_id" do
-    before do 
-      mock(@now = Object.new)
-      mock(@now).to_i{1234}
-      mock(@now).usec{1}
-      mock(Time).now{@now}
-    end
-    
-    it "should work without prefix" do
-      Sonar::Connector::Utils.timestamped_id.should == "1234000001"
-    end
-    
-    it "should work with prefix" do
-      Sonar::Connector::Utils.timestamped_id("foo").should == "foo_1234000001"
+  describe "stdout_logger" do
+    it "should return a logger" do
+      pending
     end
   end
+  
+  describe "disk_logger" do
+    it "should return a logger" do
+      pending
+    end
+  end
+  
 end

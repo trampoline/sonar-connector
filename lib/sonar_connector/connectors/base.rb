@@ -26,8 +26,17 @@ module Sonar
       # run loop flag
       attr_reader :run
       
+      # File store for working files
+      attr_reader :working
+      
+      # File store for error files
+      attr_reader :error
+      
+      # File store for complete files
+      attr_reader :complete
+      
       # Associated connector that provides source data via the file system
-      attr_accessor :source_connector
+      attr_reader :source_connector
       
       def initialize(connector_config, base_config)
         @base_config = base_config
@@ -66,7 +75,6 @@ module Sonar
         @state.merge! read_state
       end
       
-      
       # Read state file
       def read_state
         s = {}
@@ -78,11 +86,17 @@ module Sonar
         return s
       end
       
-      
       # Save the state hash to a YAML file
       def save_state
         make_dir
         File.open(state_file, "w"){|f| f << state.to_yaml }
+      end
+      
+      # Create the working, error and complete main filestores
+      def create_filestores
+        @working = Sonar::Connector::FileStore.new File.join(connector_dir, "working")
+        @error = Sonar::Connector::FileStore.new File.join(connector_dir, "error")
+        @complete = Sonar::Connector::FileStore.new File.join(connector_dir, "complete")
       end
       
       # Cleanup routine after connector shutdown
@@ -95,6 +109,7 @@ module Sonar
       # until Thread.raise is called on this instance.
       def start(queue)
         @queue = queue
+        create_filestores
         switch_to_log_file
         
         while run
@@ -127,13 +142,14 @@ module Sonar
       end
       
       def to_s
-        "Connector '#{name}'"
+        "#{self.class} '#{name}'"
       end
       alias :inspect :to_s
       
       private
       
       attr_reader :state_file, :base_config, :log_file
+      attr_writer :source_connector
       
       def sleep_for(seconds=0)
         sleep seconds

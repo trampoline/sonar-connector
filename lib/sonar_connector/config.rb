@@ -151,7 +151,7 @@ module Sonar
           c = connectors.select{|connector| connector.name == source_name}.first
           raise InvalidConfig.new("Connector '#{connector.name}' references source_connector '#{source_name}' but no such connector name is defined.") unless c
           raise InvalidConfig.new("Connector '#{connector.name}' cannot have itself as a source_connector.") if c == connector
-          connector.source_connector = c
+          connector.send :source_connector=, c
         end
       end
       

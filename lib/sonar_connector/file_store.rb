@@ -8,6 +8,7 @@ module Sonar
       UUID_SLICE_LENGTH = 3  # number of digits to break 
       UUID_RADIX = 20        # 3 digits in base 20 gives a reasonable max count of 8000 files or dirs in any one dir.
       UUID_PAD_LENGTH = 30   # must be a multiple of UUID_SLICE_LENGTH
+      DIR_DEPTH = 2          # directory tree depth
       
       attr_reader :base_dir
       attr_reader :extension
@@ -26,7 +27,7 @@ module Sonar
       def files
         return @files unless dirty?
         glob = File.join base_dir, "**", "*#{extension}"
-        @dirty = false
+        clean!
         @files = Dir[glob]
       end
       
@@ -35,13 +36,13 @@ module Sonar
         dirname = File.dirname(filename)
         FileUtils.mkdir_p dirname unless File.directory?(dirname)
         File.open(filename, "w") {|f| f << content}
-        @dirty = true
+        dirty!
         filename
       end
       
       def new_filename(suffix = nil)
         uuid = UUIDTools::UUID.timestamp_create.to_i.to_s(UUID_RADIX).rjust(UUID_PAD_LENGTH, "0")
-        dirname = File.join base_dir, *uuid.scan(/.{1,#{UUID_SLICE_LENGTH}}/)[0...-1]
+        dirname = File.join base_dir, *uuid.scan(/.{1,#{UUID_SLICE_LENGTH}}/)[0..DIR_DEPTH]
         File.join dirname, [uuid, suffix].compact.join("_") + extension
       end
       
@@ -62,17 +63,25 @@ module Sonar
       def setup
         if File.directory?(base_dir)
           raise "#{base_dir} already exists and is not a file store." unless File.exist?(base_file)
-          @dirty = true
+          dirty!
         else
           FileUtils.mkdir_p base_dir
           FileUtils.touch base_file
           @files = []
-          @dirty = false
+          clean!
         end
       end
       
       def dirty?
         @dirty
+      end
+      
+      def dirty!
+        @dirty = true
+      end
+      
+      def clean!
+        @dirty = false
       end
       
     end

@@ -31,8 +31,11 @@ module Sonar
       def action
         if Net::Ping::External.new(host, port, 5).ping?
           state[:consecutive_errors] = 0
+          log.info "Successfully pinged #{host}:#{port}"
         else
           state[:consecutive_errors] += 1
+          log.info "Couldn't reach #{host}:#{port}"
+          
           if state[:consecutive_errors] == retry_count
             state[:consecutive_errors] = 0
             queue.push Sonar::Connector::SendAdminEmailCommand.new(self, "tried to ping #{host} but failed to reach it #{retry_count} times")

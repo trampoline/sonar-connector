@@ -44,15 +44,14 @@ module Sonar
         @threads = []
         
         @queue = Queue.new
-        @log = Logger.new STDOUT
-        @log.level = @config.log_level
+        @log = Sonar::Connector::Utils.stdout_logger @config
         
       rescue Sonar::Connector::InvalidConfig => e
         raise RuntimeError, "Invalid configuration in #{config_filename}: \n #{e.message}"
       end
       
       def switch_to_log_file
-        @log = Logger.new(config.controller_log_file, config.log_files_to_keep, config.log_file_max_size)
+        @log = Sonar::Connector::Utils.disk_logger(config.controller_log_file, config)
       end
       
       ##

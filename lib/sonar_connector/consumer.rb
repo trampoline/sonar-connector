@@ -33,16 +33,14 @@ module Sonar
         
         # Creat logger and inherit the logger settings from the base controller config
         @log_file = File.join(base_config.log_dir, "consumer.log")
-        @log = Logger.new STDOUT
-        @log.level = base_config.log_level
+        @log = Sonar::Connector::Utils.stdout_logger base_config
         
         @run = true
       end
       
       def switch_to_log_file
         FileUtils.mkdir_p(base_config.log_dir) unless File.directory?(base_config.log_dir)
-        FileUtils.touch @log_file
-        @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
+        @log = Sonar::Connector::Utils.disk_logger(@log_file, base_config)
       end
       
       def cleanup

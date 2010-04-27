@@ -36,9 +36,8 @@ module Sonar
         @name = connector_config["name"]
         
         # Create STDOUT logger and inherit the logger settings from the base controller config
-        @log_file = File.join(base_config.log_dir, "connector_#{@name}.log")
-        @log = Logger.new(STDOUT)
-        @log.level = base_config.log_level
+        @log_file = File.join base_config.log_dir, "connector_#{@name}.log"
+        @log = Sonar::Connector::Utils.stdout_logger base_config
         
         # every connector instance must set the repeat delay
         raise InvalidConfig.new("Connector '#{@name}': repeat_delay is missing or blank") if connector_config["repeat_delay"].blank?
@@ -59,7 +58,7 @@ module Sonar
       # Logging defaults to use STDOUT. After initialization we need to switch the 
       # logger to use an output file.
       def switch_to_log_file
-        @log = Logger.new(@log_file, base_config.log_files_to_keep, base_config.log_file_max_size)
+        @log = Sonar::Connector::Utils.disk_logger(log_file, base_config)
       end
       
       # Load the state hash from YAML file
@@ -134,7 +133,7 @@ module Sonar
       
       private
       
-      attr_reader :state_file, :base_config
+      attr_reader :state_file, :base_config, :log_file
       
       def sleep_for(seconds=0)
         sleep seconds

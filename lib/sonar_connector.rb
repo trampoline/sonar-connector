@@ -28,7 +28,6 @@ require 'fileutils'
   utils
   connectors/base
   connectors/dummy_connector
-  connectors/ping_connector
   commands/command
   commands/update_status_command
   commands/send_admin_email_command

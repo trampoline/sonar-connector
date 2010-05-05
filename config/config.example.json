@@ -45,12 +45,6 @@
       "class": "Sonar::Connector::DummyConnector",
       "name": "dummy_connector1",
       "repeat_delay": 10
-    },
-    {
-      "class": "Sonar::Connector::PingConnector",
-      "name": "ping_connector1",
-      "repeat_delay": 60,
-      "host": "www.google.com"
     }
   ]
 }

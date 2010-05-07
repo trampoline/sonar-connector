@@ -32,6 +32,7 @@ require 'fileutils'
   commands/update_status_command
   commands/send_admin_email_command
   commands/update_disk_usage_command
+  commands/increment_status_value_command
 ).each do |file|
   require File.expand_path File.join(Sonar::Connector::ROOT, 'sonar_connector', file)
 end

@@ -17,7 +17,7 @@ begin
     gem.add_dependency "json_pure", ">= 1.2.2"
     gem.add_dependency "uuidtools", ">= 2.1.1"
     
-    gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_development_dependency "rspec", ">= 1.2.8"
     gem.add_development_dependency "rr", ">= 0.10.5"
   end
   Jeweler::GemcutterTasks.new

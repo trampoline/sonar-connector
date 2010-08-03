@@ -6,7 +6,7 @@ module Sonar
     class FileStore
       # MAX_FILENAME_LENGTH = 220 # not used yet.
       UUID_SLICE_LENGTH = 3  # number of digits to break 
-      UUID_RADIX = 20        # 3 digits in base 20 gives a reasonable max count of 8000 files or dirs in any one dir.
+      UUID_RADIX = 16        # 3 digits in base 16 gives a reasonable max count of 4096 files or dirs in any one dir, which is just about ok for ext3
       UUID_PAD_LENGTH = 30   # must be a multiple of UUID_SLICE_LENGTH
       DIR_DEPTH = 2          # directory tree depth
       

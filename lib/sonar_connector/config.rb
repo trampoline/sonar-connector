@@ -148,7 +148,7 @@ module Sonar
         connectors.each do |connector|
           source_name = connector.raw_config["source_connector"]
           next if source_name.blank?
-          c = connectors.select{|connector| connector.name == source_name}.first
+          c = connectors.select{|connector2| connector2.name == source_name}.first
           raise InvalidConfig.new("Connector '#{connector.name}' references source_connector '#{source_name}' but no such connector name is defined.") unless c
           raise InvalidConfig.new("Connector '#{connector.name}' cannot have itself as a source_connector.") if c == connector
           connector.send :source_connector=, c

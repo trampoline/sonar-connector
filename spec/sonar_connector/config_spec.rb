@@ -60,6 +60,20 @@ describe Sonar::Connector::Config do
       connector1.source_connector.should be_nil
       connector2.source_connector.should == connector1
     end
+
+    it "should associate multiple source connectors correctly" do
+      connector1 = connector_with_name_and_source 'c1', nil
+      connector2 = connector_with_name_and_source 'c2', 'c1'
+      connector3 = connector_with_name_and_source 'c3', nil
+      connector4 = connector_with_name_and_source 'c4', 'c3'
+      
+      @config.send :associate_connector_dependencies!, [connector1, connector2, connector3, connector4]
+      
+      connector1.source_connector.should be_nil
+      connector2.source_connector.should == connector1
+      connector3.source_connector.should be_nil
+      connector4.source_connector.should == connector3
+    end
     
     it "should raise error when source_connector doesn't exist" do
       connector1 = connector_with_name_and_source 'c1', 'invalid_connector_name'

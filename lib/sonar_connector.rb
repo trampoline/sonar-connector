@@ -4,7 +4,6 @@ module Sonar
   end
 end
 
-# Load Bundler
 require 'rubygems'
 
 # Load external deps
@@ -16,6 +15,7 @@ require 'logger'
 require 'action_mailer'
 require 'actionmailer_extensions'
 require 'fileutils'
+require 'sonar_connector_filestore'
 
 # Load internal classes
 %W(
@@ -24,7 +24,6 @@ require 'fileutils'
   status
   consumer
   emailer
-  file_store
   utils
   connectors/base
   connectors/dummy_connector

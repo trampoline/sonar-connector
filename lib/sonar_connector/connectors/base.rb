@@ -26,14 +26,8 @@ module Sonar
       # run loop flag
       attr_reader :run
       
-      # File store for working files
-      attr_reader :working
-      
-      # File store for error files
-      attr_reader :error
-      
-      # File store for complete files
-      attr_reader :complete
+      # connector FileStore
+      attr_reader :filestore
       
       # Associated connector that provides source data via the file system
       attr_reader :source_connector
@@ -54,10 +48,14 @@ module Sonar
         raise InvalidConfig.new("Connector '#{@name}': repeat_delay must be >= 1 second") if @repeat_delay < 1
         
         @connector_dir = File.join(base_config.connectors_dir, @name)
+        FileUtils.mkdir_p(@connector_dir)
         @state_file = File.join(@connector_dir, "state.yml")
         
         # empty state hash which will get written to by parse, and then potentially over-written by load_state
         @state = {}
+
+        @filestore = Sonar::Connector::FileStore.new(@connector_dir, :filestore, [:working, :error, :complete, :actions])
+
         parse connector_config
         load_state
         
@@ -92,13 +90,6 @@ module Sonar
         File.open(state_file, "w"){|f| f << state.to_yaml }
       end
       
-      # Create the working, error and complete main filestores
-      def create_filestores
-        @working = Sonar::Connector::FileStore.new File.join(connector_dir, "working")
-        @error = Sonar::Connector::FileStore.new File.join(connector_dir, "error")
-        @complete = Sonar::Connector::FileStore.new File.join(connector_dir, "complete")
-      end
-      
       # Cleanup routine after connector shutdown
       def cleanup
       end
@@ -107,13 +98,19 @@ module Sonar
       # until Thread.raise is called on this instance.
       def start(queue)
         @queue = queue
-        create_filestores
         switch_to_log_file
         
+        cleanup_old_action_filestores # in case we were interrupted mid-action
+        cleanup # before we begin
+
         while run
           begin
             log.info "beginning action"
-            self.action
+
+            in_action_context do
+              action
+            end
+
             save_state
             log.info "finished action and saved state"
             
@@ -166,7 +163,67 @@ module Sonar
       def make_dir
         FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
       end
+
+      class ActionContext
+        attr_reader :connector
+
+        # action specific filestore
+        attr_reader :filestore
+        
+        def initialize(connector, filestore)
+          @connector = connector
+          @filestore = filestore
+        end
+
+        def respond_to?(sym, include_private=false)
+          self.respond_to?(sym, include_private) || connector.respond_to?(sym, include_private)
+        end
+
+        def method_missing(m,*args)
+          connector.send(m, *args)
+        end
+      end
+
+      def in_action_context(&proc)
+        fs = create_action_filestore
+        begin
+          initialize_action_filestore
+          context = ActionContext.new(self, fs)
+          context.instance_eval(&proc)
+        ensure
+          finalize_action_filestore(fs)
+        end
+      end
       
+      def create_action_filestore
+        now = Time.new
+        fs_name = now.strftime("action_%Y%m%d_%H%M%S_") + UUIDTools::UUID.timestamp_create.to_s.gsub('-','_')
+        action_fs_root = filestore.area_path(:actions)
+        FileStore.new(action_fs_root, fs_name, [:working, :error, :complete])
+      end
+
+      def initialize_action_filestore(fs)
+        # grab any unfinished work for this action
+        filestore.flip(:working, fs, :working)
+        fs.scrub!(:working)
+      end
+
+      def finalize_action_filestore(fs)
+        [:complete, :error, :working].each do |area|
+          fs.scrub!(area)
+          fs.flip(area, filestore, area)
+        end
+        fs.destroy!
+      end
+
+      def cleanup_old_action_filestores
+        actionfs_root = filestore.area_path(:actions)
+        
+        Dir.foreach(actionfs_root) do |fs_name|
+          fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete])
+          finalize_action_filestore(fs)
+        end
+      end
     end
   end
 end

@@ -109,20 +109,20 @@ module Sonar
 
             in_action_context do
               action
-            end
 
-            save_state
-            log.info "finished action and saved state"
-            
-            log.info "working count: #{working.count}"
-            log.info "error count: #{error.count}"
-            log.info "complete count: #{complete.count}"
-            
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'last_action', Sonar::Connector::ACTION_OK)
-            queue << Sonar::Connector::UpdateDiskUsageCommand.new(self)
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'working_count', working.count)
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'error_count', error.count)
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'complete_count', complete.count)
+              save_state
+              log.info "finished action and saved state"
+              
+              log.info "working count: #{filestore.count(:working)}"
+              log.info "error count: #{filestore.count(:error)}"
+              log.info "complete count: #{filestore.count(:complete)}"
+              
+              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_OK)
+              queue << Sonar::Connector::UpdateDiskUsageCommand.new(connector)
+              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'working_count', filestore.count(:working))
+              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'error_count', filestore.count(:error))
+              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'complete_count', filestore.count(:complete))
+            end
             sleep_for repeat_delay
             
           rescue ThreadTerminator
@@ -187,7 +187,7 @@ module Sonar
       def in_action_context(&proc)
         fs = create_action_filestore
         begin
-          initialize_action_filestore
+          initialize_action_filestore(fs)
           context = ActionContext.new(self, fs)
           context.instance_eval(&proc)
         ensure
@@ -220,8 +220,10 @@ module Sonar
         actionfs_root = filestore.area_path(:actions)
         
         Dir.foreach(actionfs_root) do |fs_name|
-          fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete])
-          finalize_action_filestore(fs)
+          if FileStore.valid_filestore_name(fs_name)
+            fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete])
+            finalize_action_filestore(fs)
+          end
         end
       end
     end

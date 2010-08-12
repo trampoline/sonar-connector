@@ -108,12 +108,24 @@ module Sonar
       # the main run loop that every connector executes indefinitely 
       # until Thread.raise is called on this instance.
       def start(queue)
-        @queue = queue
-        switch_to_log_file
-        
-        cleanup_old_action_filestores # in case we were interrupted mid-action
-        cleanup # before we begin
+        begin
+          @queue = queue
+          switch_to_log_file
+          
+          cleanup_old_action_filestores # in case we were interrupted mid-action
+          cleanup # before we begin
 
+          run_loop
+
+          @run = false
+          cleanup
+          true
+        rescue Exception=>e
+          log.error([e.class.to_s, e.message, *e.backtrace].join("\n"))
+        end
+      end
+
+      def run_loop
         while run
           begin
             log.info "beginning action"
@@ -146,10 +158,6 @@ module Sonar
             sleep_for 5
           end
         end
-        
-        @run = false
-        cleanup
-        true
       end
       
       # Connector subclasses can overload the parse method.

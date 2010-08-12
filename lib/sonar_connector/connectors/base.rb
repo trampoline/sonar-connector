@@ -28,8 +28,11 @@ module Sonar
       
       # run loop flag
       attr_reader :run
-      
-      # connector FileStore
+
+      # filestore for whole connector
+      attr_reader :connector_filestore
+
+      # filestore for an action run
       attr_reader :filestore
       
       # Associated connector that provides source data via the file system
@@ -58,22 +61,22 @@ module Sonar
         # empty state hash which will get written to by parse, and then potentially over-written by load_state
         @state = {}
 
-        @filestore = Sonar::Connector::FileStore.new(@connector_dir, 
-                                                     "#{@name}_filestore", 
-                                                     [:working, :error, :complete, :actions],
-                                                     :logger=>@log)
+        @connector_filestore = Sonar::Connector::FileStore.new(@connector_dir, 
+                                                               "#{@name}_filestore", 
+                                                               [:working, :error, :complete, :actions],
+                                                               :logger=>@log)
 
         parse connector_config
         load_state
         
         @run = true
       end
-      
+
       # Logging defaults to use STDOUT. After initialization we need to switch the 
       # logger to use an output file.
       def switch_to_log_file
         @log = Sonar::Connector::Utils.disk_logger(log_file, base_config)
-        @filestore.logger = @log if @filestore
+        @connector_filestore.logger = @log if @connector_filestore
       end
       
       # Load the state hash from YAML file
@@ -115,7 +118,7 @@ module Sonar
           begin
             log.info "beginning action"
 
-            in_action_context do
+            with_action_filestore do
               action
 
               save_state
@@ -172,33 +175,14 @@ module Sonar
         FileUtils.mkdir_p(@connector_dir) unless File.directory?(@connector_dir)
       end
 
-      class ActionContext
-        attr_reader :connector
-
-        # action specific filestore
-        attr_reader :filestore
-        
-        def initialize(connector, filestore)
-          @connector = connector
-          @filestore = filestore
-        end
-
-        def respond_to?(sym, include_private=false)
-          self.respond_to?(sym, include_private) || connector.respond_to?(sym, include_private)
-        end
-
-        def method_missing(m,*args)
-          connector.send(m, *args)
-        end
-      end
-
-      def in_action_context(&proc)
+      def with_action_filestore
         fs = create_action_filestore
         begin
           initialize_action_filestore(fs)
-          context = ActionContext.new(self, fs)
-          context.instance_eval(&proc)
+          @filestore = fs
+          yield
         ensure
+          @filestore = nil
           finalize_action_filestore(fs)
         end
       end
@@ -206,26 +190,26 @@ module Sonar
       def create_action_filestore
         now = Time.new
         fs_name = now.strftime("action_%Y%m%d_%H%M%S_") + UUIDTools::UUID.timestamp_create.to_s.gsub('-','_')
-        action_fs_root = filestore.area_path(:actions)
+        action_fs_root = connector_filestore.area_path(:actions)
         FileStore.new(action_fs_root, fs_name, [:working, :error, :complete], :logger=>@log)
       end
 
       def initialize_action_filestore(fs)
         # grab any unfinished work for this action
-        filestore.flip(:working, fs, :working)
+        connector_filestore.flip(:working, fs, :working)
         fs.scrub!(:working)
       end
 
       def finalize_action_filestore(fs)
         [:complete, :error, :working].each do |area|
           fs.scrub!(area)
-          fs.flip(area, filestore, area)
+          fs.flip(area, connector_filestore, area)
         end
         fs.destroy!
       end
 
       def cleanup_old_action_filestores
-        actionfs_root = filestore.area_path(:actions)
+        actionfs_root = connector_filestore.area_path(:actions)
         
         Dir.foreach(actionfs_root) do |fs_name|
           if File.directory?(fs_name) && FileStore.valid_filestore_name(fs_name)

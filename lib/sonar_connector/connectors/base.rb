@@ -4,6 +4,9 @@ module Sonar
       
       # every connector has a unique name
       attr_reader :name
+
+      # this connector
+      attr_reader :connector
       
       # Connector-specific config hash
       attr_reader :raw_config
@@ -37,6 +40,7 @@ module Sonar
         @raw_config = connector_config
         
         @name = connector_config["name"]
+        @connector = self
         
         # Create STDOUT logger and inherit the logger settings from the base controller config
         @log_file = File.join base_config.log_dir, "connector_#{@name}.log"
@@ -54,7 +58,10 @@ module Sonar
         # empty state hash which will get written to by parse, and then potentially over-written by load_state
         @state = {}
 
-        @filestore = Sonar::Connector::FileStore.new(@connector_dir, :filestore, [:working, :error, :complete, :actions])
+        @filestore = Sonar::Connector::FileStore.new(@connector_dir, 
+                                                     "#{@name}_filestore", 
+                                                     [:working, :error, :complete, :actions],
+                                                     :logger=>@log)
 
         parse connector_config
         load_state
@@ -66,6 +73,7 @@ module Sonar
       # logger to use an output file.
       def switch_to_log_file
         @log = Sonar::Connector::Utils.disk_logger(log_file, base_config)
+        @filestore.logger = @log if @filestore
       end
       
       # Load the state hash from YAML file
@@ -131,7 +139,7 @@ module Sonar
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
-            queue << Sonar::Connector::UpdateStatusCommand.new(self, 'last_action', Sonar::Connector::ACTION_FAILED)
+            queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_FAILED)
             sleep_for 5
           end
         end
@@ -199,7 +207,7 @@ module Sonar
         now = Time.new
         fs_name = now.strftime("action_%Y%m%d_%H%M%S_") + UUIDTools::UUID.timestamp_create.to_s.gsub('-','_')
         action_fs_root = filestore.area_path(:actions)
-        FileStore.new(action_fs_root, fs_name, [:working, :error, :complete])
+        FileStore.new(action_fs_root, fs_name, [:working, :error, :complete], :logger=>@log)
       end
 
       def initialize_action_filestore(fs)
@@ -220,8 +228,8 @@ module Sonar
         actionfs_root = filestore.area_path(:actions)
         
         Dir.foreach(actionfs_root) do |fs_name|
-          if FileStore.valid_filestore_name(fs_name)
-            fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete])
+          if File.directory?(fs_name) && FileStore.valid_filestore_name(fs_name)
+            fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete], :logger=>@log)
             finalize_action_filestore(fs)
           end
         end

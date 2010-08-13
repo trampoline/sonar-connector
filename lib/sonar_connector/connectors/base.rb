@@ -153,11 +153,8 @@ module Sonar
           action
 
           save_state
-          log.info "finished action and saved state"
-          
-          log.info "working count: #{filestore.count(:working)}"
-          log.info "error count: #{filestore.count(:error)}"
-          log.info "complete count: #{filestore.count(:complete)}"
+          log.info "finished action,saved state"
+          log.info "working: #{filestore.count(:working)}, error: #{filestore.count(:error)}, complete: #{filestore.count(:complete)}"
           
           queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_OK)
           queue << Sonar::Connector::UpdateDiskUsageCommand.new(connector)

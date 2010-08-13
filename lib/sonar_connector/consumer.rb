@@ -37,6 +37,11 @@ module Sonar
         
         @run = true
       end
+
+      def prepare(queue)
+        @queue = queue
+        switch_to_log_file
+      end
       
       def switch_to_log_file
         FileUtils.mkdir_p(base_config.log_dir) unless File.directory?(base_config.log_dir)
@@ -50,14 +55,10 @@ module Sonar
       
       ##
       # Main loop to watch the command queue and process commands.
-      def watch(queue)
-        @queue = queue
-        switch_to_log_file
-        
+      def watch
         while run
           begin
-            command = queue.pop
-            command.execute ExecutionContext.new(:log=>log, :status=>status)
+            run_once
           rescue ThreadTerminator
             break
           rescue Exception => e
@@ -69,7 +70,11 @@ module Sonar
         cleanup
         true
       end
-      
+
+      def run_once
+        command = queue.pop
+        command.execute ExecutionContext.new(:log=>log, :status=>status)
+      end
     end
   end
 end

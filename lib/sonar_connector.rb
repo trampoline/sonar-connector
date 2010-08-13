@@ -5,6 +5,7 @@ module Sonar
 end
 
 require 'rubygems'
+$:.unshift(File.expand_path("..", __FILE__))
 
 # Load external deps
 require 'active_support'
@@ -33,5 +34,5 @@ require 'sonar_connector_filestore'
   commands/update_disk_usage_command
   commands/increment_status_value_command
 ).each do |file|
-  require File.expand_path File.join(Sonar::Connector::ROOT, 'sonar_connector', file)
+  require File.join('sonar_connector', file)
 end

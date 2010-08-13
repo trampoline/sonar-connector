@@ -72,6 +72,14 @@ module Sonar
         @run = true
       end
 
+      def prepare(queue)
+        @queue = queue
+        switch_to_log_file
+        
+        cleanup_old_action_filestores # in case we were interrupted mid-action
+        cleanup # before we begin
+      end
+
       # Logging defaults to use STDOUT. After initialization we need to switch the 
       # logger to use an output file.
       def switch_to_log_file
@@ -107,14 +115,8 @@ module Sonar
       
       # the main run loop that every connector executes indefinitely 
       # until Thread.raise is called on this instance.
-      def start(queue)
+      def start
         begin
-          @queue = queue
-          switch_to_log_file
-          
-          cleanup_old_action_filestores # in case we were interrupted mid-action
-          cleanup # before we begin
-
           run_loop
 
           @run = false
@@ -128,35 +130,37 @@ module Sonar
       def run_loop
         while run
           begin
-            log.info "beginning action"
-
-            with_action_filestore do
-              action
-
-              save_state
-              log.info "finished action and saved state"
-              
-              log.info "working count: #{filestore.count(:working)}"
-              log.info "error count: #{filestore.count(:error)}"
-              log.info "complete count: #{filestore.count(:complete)}"
-              
-              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_OK)
-              queue << Sonar::Connector::UpdateDiskUsageCommand.new(connector)
-              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'working_count', filestore.count(:working))
-              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'error_count', filestore.count(:error))
-              queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'complete_count', filestore.count(:complete))
-            end
+            run_once
             sleep_for repeat_delay
-            
           rescue ThreadTerminator
             break
-            
           rescue Exception => e
             log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
             queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_FAILED)
             sleep_for 5
           end
+        end
+      end
+
+      def run_once
+        log.info "beginning action"
+
+        with_action_filestore do
+          action
+
+          save_state
+          log.info "finished action and saved state"
+          
+          log.info "working count: #{filestore.count(:working)}"
+          log.info "error count: #{filestore.count(:error)}"
+          log.info "complete count: #{filestore.count(:complete)}"
+          
+          queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_OK)
+          queue << Sonar::Connector::UpdateDiskUsageCommand.new(connector)
+          queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'working_count', filestore.count(:working))
+          queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'error_count', filestore.count(:error))
+          queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'complete_count', filestore.count(:complete))
         end
       end
       
@@ -220,7 +224,8 @@ module Sonar
         actionfs_root = connector_filestore.area_path(:actions)
         
         Dir.foreach(actionfs_root) do |fs_name|
-          if File.directory?(fs_name) && FileStore.valid_filestore_name(fs_name)
+          fs_path = File.join(actionfs_root, fs_name)
+          if File.directory?(fs_path) && FileStore.valid_filestore_name(fs_name)
             fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete], :logger=>@log)
             finalize_action_filestore(fs)
           end

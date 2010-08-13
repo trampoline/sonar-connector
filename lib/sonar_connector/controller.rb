@@ -5,6 +5,8 @@ module Sonar
     
     class Controller
       
+      DEFAULT_CONFIG_FILENAME = "config/config.json"
+
       ##
       # single command queue for threads to communicate with the controller
       attr_reader :queue
@@ -36,17 +38,20 @@ module Sonar
       ##
       # Parse the config file and create instances of each connector, 
       # parsing their config in turn.
-      def initialize(config_filename)
+      def initialize(config_filename = DEFAULT_CONFIG_FILENAME)
         @config = Sonar::Connector::Config.load config_filename
+        @log = Sonar::Connector::Utils.stdout_logger @config
+
         @connectors = @config.connectors
         @consumer = Sonar::Connector::Consumer.new(@config)
         
         @threads = []
         
         @queue = Queue.new
-        @log = Sonar::Connector::Utils.stdout_logger @config
         
+        create_startup_dirs_and_files
       rescue Sonar::Connector::InvalidConfig => e
+        $stderr << ([e.class.to_s, e.message, *e.backtrace].join("\n")) << "\n"
         raise RuntimeError, "Invalid configuration in #{config_filename}: \n #{e.message}"
       end
       
@@ -54,23 +59,10 @@ module Sonar
         @log = Sonar::Connector::Utils.disk_logger(config.controller_log_file, config)
       end
       
-      ##
-      # Main framework loop. Fire up one thread per connector, 
-      # plus the message queue consumer. Then wait for quit signal.
       def start
-        create_startup_dirs_and_files
-        switch_to_log_file
-        log_startup_params
-        
-        # fire up the connector threads
-        connectors.each do |connector|
-          log.info "starting connector '#{connector.name}'"
-          threads << Thread.new { connector.start(queue) }
-        end
-        
-        log.info "starting the message queue consumer"
-        threads << Thread.new{ consumer.watch(queue) }
-        
+        prepare_connector
+        start_threads
+
         cleanup = lambda do
           puts "\nGiving threads 10 seconds to shut down..."
           threads.each{|t| t.raise(ThreadTerminator)}
@@ -99,6 +91,43 @@ module Sonar
         puts "Ctrl-C to stop."
         trap "SIGINT", cleanup
         endless_sleep
+      end
+
+      # prepare the connector, start an IRB console, but don't start any threads
+      def start_console
+        prepare_connector
+        # make the Controller globally visible
+        Connector.const_set("CONTROLLER", self)
+
+        require 'irb'
+        IRB.start
+      end
+
+      def prepare_connector
+        switch_to_log_file
+        log_startup_params
+        
+        connectors.each do |connector|
+          log.info "preparing connector '#{connector.name}'"
+          connector.prepare(queue)
+        end
+
+        log.info "preparing message queue consumer"
+        consumer.prepare(queue)
+      end
+
+      ##
+      # Main framework loop. Fire up one thread per connector, 
+      # plus the message queue consumer. Then wait for quit signal.
+      def start_threads
+        # fire up the connector threads
+        connectors.each do |connector|
+          log.info "starting connector '#{connector.name}'"
+          threads << Thread.new { connector.start }
+        end
+        
+        log.info "starting the message queue consumer"
+        threads << Thread.new{ consumer.watch }
       end
       
       private

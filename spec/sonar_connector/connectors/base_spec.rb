@@ -130,7 +130,8 @@ describe Sonar::Connector::Base do
       
       mock(@connector).action.times(2)
       
-      @connector.start(@queue)
+      @connector.prepare(@queue)
+      @connector.start()
     end
     
     it "should catch uncaught exceptions from the action" do
@@ -145,13 +146,15 @@ describe Sonar::Connector::Base do
         action(){true}
       end
       
-      @connector.start(@queue)
+      @connector.prepare(@queue)
+      @connector.start
     end
     
     it "should terminate on ThreadTerminator exception" do
       stub(@connector).run{true}
       mock(@connector).action(){raise Sonar::Connector::ThreadTerminator.new}
-      @connector.start(@queue)
+      @connector.prepare(@queue)
+      @connector.start
     end
     
     it "should queue status update and disk usage commands on successful action" do
@@ -165,7 +168,8 @@ describe Sonar::Connector::Base do
       stub(Sonar::Connector::UpdateDiskUsageCommand).new
       stub(@queue, :<<)
       
-      @connector.start(@queue)
+      @connector.prepare(@queue)
+      @connector.start
       
       Sonar::Connector::UpdateStatusCommand.should have_received.new(anything, 'last_action', Sonar::Connector::ACTION_OK).times(2)
       Sonar::Connector::UpdateDiskUsageCommand.should have_received.new(anything).times(2)
@@ -185,7 +189,8 @@ describe Sonar::Connector::Base do
       command = Object.new
       mock(Sonar::Connector::UpdateStatusCommand).new(anything, 'last_action', Sonar::Connector::ACTION_FAILED).times(1){command}
       mock(@queue, :<<).with(command).times(1)
-      @connector.start(@queue)
+      @connector.prepare(@queue)
+      @connector.start
     end
     
   end

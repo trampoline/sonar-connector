@@ -135,7 +135,10 @@ module Sonar
           rescue ThreadTerminator
             break
           rescue Exception => e
-            log.error "Connector '#{name} raised an unhandled exception: \n#{e.message}\n#{e.backtrace.join("\n")}"
+            log.error ["Connector '#{name} raised an unhandled exception:",
+                       e.class.to_s,
+                       e.message,
+                       *e.backtrace].join("\n")
             log.info "Connector blew up with an exception - waiting 5 seconds before retrying."
             queue << Sonar::Connector::UpdateStatusCommand.new(connector, 'last_action', Sonar::Connector::ACTION_FAILED)
             sleep_for 5

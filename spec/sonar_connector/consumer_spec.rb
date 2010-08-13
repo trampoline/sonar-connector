@@ -60,7 +60,8 @@ describe Sonar::Connector::Consumer do
         run(){false}
       end
       
-      @consumer.watch(@queue)
+      @consumer.prepare(@queue)
+      @consumer.watch
     end
     
     it "should handle uncaught exceptions thrown by a command" do
@@ -82,7 +83,8 @@ describe Sonar::Connector::Consumer do
         run(){false}
       end
       
-      @consumer.watch(@queue)
+      @consumer.prepare(@queue)
+      @consumer.watch
     end
     
     it "should terminate on ThreadTerminator exception" do
@@ -100,7 +102,8 @@ describe Sonar::Connector::Consumer do
       @queue << k1
       @queue << k2
       
-      @consumer.watch(@queue)
+      @consumer.prepare(@queue)
+      @consumer.watch
     end
     
   end

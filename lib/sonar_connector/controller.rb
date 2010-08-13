@@ -78,7 +78,10 @@ module Sonar
           rescue ThreadTerminator
             # ignore it, since it's come from one of the recently-nuked threads.
           rescue Exception => e
-            log.debug "Caught unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
+            log.debug ["Caught unhandled exception: ",
+                       e.class.to_s,
+                       e.message,
+                       *e.backtrace].join("\n")
           end
           
           puts "...exited cleanly."

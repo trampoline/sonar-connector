@@ -61,8 +61,6 @@ module Sonar
             run_once
           rescue ThreadTerminator
             break
-          rescue Exception => e
-            log.error "Command #{command.class} raised an unhandled exception: " + e.message + "\n" + e.backtrace.join("\n")
           end
         end
         
@@ -72,8 +70,15 @@ module Sonar
       end
 
       def run_once
-        command = queue.pop
-        command.execute ExecutionContext.new(:log=>log, :status=>status)
+        begin
+          command = queue.pop
+          command.execute ExecutionContext.new(:log=>log, :status=>status)
+        rescue ThreadTerminator => e
+          raise
+        rescue Exception => e
+          log.error ["Command #{command.class} raised an unhandled exception: ",
+                     e.class.to_s, e.message, *e.backtrace].join('\n')
+        end
       end
     end
   end

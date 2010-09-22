@@ -35,8 +35,8 @@ module Sonar
       # filestore for an action run
       attr_reader :filestore
       
-      # Associated connector that provides source data via the file system
-      attr_reader :source_connector
+      # Array of associated connectors that provide source data via the file system
+      attr_reader :source_connectors
       
       def initialize(connector_config, base_config)
         @base_config = base_config
@@ -177,7 +177,7 @@ module Sonar
       private
       
       attr_reader :state_file, :base_config, :log_file
-      attr_writer :source_connector
+      attr_writer :source_connectors
       
       def sleep_for(seconds=0)
         sleep seconds

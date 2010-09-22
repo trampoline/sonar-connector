@@ -12,7 +12,7 @@ describe Sonar::Connector::UpdateDiskUsageCommand do
     
     @context = Object.new
     @status = Object.new
-    mock(@status).set("name", "disk_usage", "2.0 Kb")
+    mock(@status).set("name", "disk_usage", "2 Kb")
     mock(@context).status{@status}
     
     @command.execute(@context)

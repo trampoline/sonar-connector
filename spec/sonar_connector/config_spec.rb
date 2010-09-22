@@ -48,17 +48,17 @@ describe Sonar::Connector::Config do
     end
     
     def connector_with_name_and_source(name, source_name)
-      @connector_klass.new({'class'=>'MyConnector', 'name'=>name, 'source_connector'=>source_name, 'repeat_delay'=> 10}, @config)
+      @connector_klass.new({'class'=>'MyConnector', 'name'=>name, 'source_connectors'=>[source_name], 'repeat_delay'=> 10}, @config)
     end
     
-    it "should associate connector with source connector" do
+    it "should associate a source connector" do
       connector1 = connector_with_name_and_source 'c1', nil
       connector2 = connector_with_name_and_source 'c2', 'c1'
       
       @config.send :associate_connector_dependencies!, [connector1, connector2]
       
-      connector1.source_connector.should be_nil
-      connector2.source_connector.should == connector1
+      connector1.source_connectors.should be_nil
+      connector2.source_connectors.should == [connector1]
     end
 
     it "should associate multiple source connectors correctly" do
@@ -69,10 +69,10 @@ describe Sonar::Connector::Config do
       
       @config.send :associate_connector_dependencies!, [connector1, connector2, connector3, connector4]
       
-      connector1.source_connector.should be_nil
-      connector2.source_connector.should == connector1
-      connector3.source_connector.should be_nil
-      connector4.source_connector.should == connector3
+      connector1.source_connectors.should be_nil
+      connector2.source_connectors.should == [connector1]
+      connector3.source_connectors.should be_nil
+      connector4.source_connectors.should == [connector3]
     end
     
     it "should raise error when source_connector doesn't exist" do
@@ -86,7 +86,7 @@ describe Sonar::Connector::Config do
       connector1 = connector_with_name_and_source 'c1', 'c1'
       lambda{
         @config.send :associate_connector_dependencies!, [connector1]
-      }.should raise_error(Sonar::Connector::InvalidConfig, /cannot have itself as a source_connector/)
+      }.should raise_error(Sonar::Connector::InvalidConfig, /cannot have itself as a/)
     end
     
   end

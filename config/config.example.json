@@ -48,22 +48,10 @@
       "repeat_delay": 10,
       "host": "imap.gmail.com",
       "user": "craig@trampolinesystems.com",
-      "password": "c2p3m769",
+      "password": "---",
       "folders": "[Gmail]/All Mail"
     }
     ,
-
-     {
-       "class": "Sonar::Connector::SonarPushConnector",
-       "require": "sonar_push_connector",
-       "name": "sonar_push_mccraig",
-       "repeat_delay": 10,
-       "source_connector": "gmail_mccraig",
-       "uri": "http://localhost:3000/api/1_0/rfc822_messages",
-       "connector_credentials": "SVgS7CWsHwMouNay9nc3"
-     }
-     ,
-
    {
       "class": "Sonar::Connector::ImapPullConnector",
       "require": "sonar_imap_pull_connector",
@@ -71,18 +59,18 @@
       "repeat_delay": 10,
       "host": "imap.gmail.com",
       "user": "charles@trampolinesystems.com",
-      "password": "r0sebud",
+      "password": "---",
       "folders": "[Google Mail]/All Mail"
     }
      ,
      {
        "class": "Sonar::Connector::SonarPushConnector",
        "require": "sonar_push_connector",
-       "name": "sonar_push_car0lus",
+       "name": "sonar_push",
        "repeat_delay": 10,
-       "source_connector": "gmail_car0lus",
+       "source_connectors": ["gmail_car0lus", "gmail_mccraig"],
        "uri": "http://localhost:3000/api/1_0/rfc822_messages",
-       "connector_credentials": "SVgS7CWsHwMouNay9nc3"
+       "connector_credentials": "---"
      }
   ] 
 }

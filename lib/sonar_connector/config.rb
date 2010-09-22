@@ -142,16 +142,21 @@ module Sonar
         hash.keys.inject({}){|acc, k| acc[k.to_sym] = hash[k]; acc}
       end
       
-      # Find all connectors with "source_connector" specified in config, and map these 
+      # Find all connectors with "source_connectors" specified in config, and map these 
       # associations to the connector instances.
       def associate_connector_dependencies!(connectors)
         connectors.each do |connector|
-          source_name = connector.raw_config["source_connector"]
-          next if source_name.blank?
-          c = connectors.select{|connector2| connector2.name == source_name}.first
-          raise InvalidConfig.new("Connector '#{connector.name}' references source_connector '#{source_name}' but no such connector name is defined.") unless c
-          raise InvalidConfig.new("Connector '#{connector.name}' cannot have itself as a source_connector.") if c == connector
-          connector.send :source_connector=, c
+          source_names = [*connector.raw_config["source_connectors"]].compact
+          next if source_names.blank?
+          
+          source_connectors = source_names.map do |source_name|
+            c = connectors.select{|connector2| connector2.name == source_name}.first
+            raise InvalidConfig.new("Connector '#{connector.name}' references a source connector '#{source_name}' but no such connector name is defined.") unless c
+            raise InvalidConfig.new("Connector '#{connector.name}' cannot have itself as a source connector.") if c == connector
+            c
+          end
+          
+          connector.send :source_connectors=, source_connectors
         end
       end
       

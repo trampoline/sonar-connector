@@ -11,8 +11,8 @@ begin
     gem.homepage = "http://github.com/trampoline/sonar-connector"
     gem.authors = ["Peter MacRobert", "Mark Meyer"]
     
-    gem.add_dependency "actionmailer", ">= 2.3.8"
-    gem.add_dependency "actionmailer_extensions", ">= 0.4.0"
+    gem.add_dependency "actionmailer", "= 2.3.8"
+    gem.add_dependency "actionmailer_extensions", ">= 0.4.2"
     gem.add_dependency "json_pure", ">= 1.2.2"
     gem.add_dependency "uuidtools", ">= 2.1.1"
     gem.add_dependency "sonar_connector_filestore", ">= 0.1.0"

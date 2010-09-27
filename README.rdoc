@@ -12,3 +12,7 @@ Here's how to install jruby 1.4.0 on OS X:
   ln -s /usr/local/jruby/bin/rake /usr/bin/jrake
   ln -s /usr/local/jruby/bin/gem /usr/bin/jgem
   ln -s /usr/local/jruby/bin/jirb /usr/bin/jirb
+
+== Copyright
+
+Copyright (c) 2010 Trampoline Systems Ltd. See LICENSE for details.

@@ -5,8 +5,8 @@ module Sonar
     
     class Controller
       
-      DEFAULT_CONFIG_FILENAME = "config/config.json"
-
+      DEFAULT_CONFIG_FILENAME = File.join("config", "config.json")
+      
       ##
       # single command queue for threads to communicate with the controller
       attr_reader :queue
@@ -43,7 +43,7 @@ module Sonar
         @log = Sonar::Connector::Utils.stdout_logger @config
 
         @connectors = @config.connectors
-        @consumer = Sonar::Connector::Consumer.new(@config)
+        @consumer = Sonar::Connector::Consumer.new(self, @config)
         
         @threads = []
         
@@ -63,36 +63,13 @@ module Sonar
         prepare_connector
         start_threads
 
-        cleanup = lambda do
-          puts "\nGiving threads 10 seconds to shut down..."
-          threads.each{|t| t.raise(ThreadTerminator)}
-          begin
-            Timeout::timeout(10) { 
-              threads.map(&:join)
-            }
-          rescue Timeout::Error
-            puts "...couldn't stop all threads cleanly."
-            log.info "Could not cleanly terminate all threads."
-            log.close
-            exit(1)
-          rescue ThreadTerminator
-            # ignore it, since it's come from one of the recently-nuked threads.
-          rescue Exception => e
-            log.debug ["Caught unhandled exception: ",
-                       e.class.to_s,
-                       e.message,
-                       *e.backtrace].join("\n")
-          end
-          
-          puts "...exited cleanly."
-          log.info "Terminated all threads cleanly."
-          log.close
-          exit(0)
-        end
-        
         # let the controlling thread go into an endless sleep
         puts "Ctrl-C to stop."
-        trap "SIGINT", cleanup
+        
+        # Standardize shutdown via ctrl-c and SIGTERM (from god)
+        trap "SIGINT", shutdown_lambda
+        trap "SIGTERM", shutdown_lambda
+        
         endless_sleep
       end
 
@@ -131,6 +108,36 @@ module Sonar
         
         log.info "starting the message queue consumer"
         threads << Thread.new{ consumer.watch }
+      end
+      
+      
+      def shutdown_lambda
+        lambda do
+          puts "\nGiving threads 10 seconds to shut down..."
+          threads.each{|t| t.raise(ThreadTerminator)}
+          begin
+            Timeout::timeout(10) { 
+              threads.map(&:join)
+            }
+          rescue Timeout::Error
+            puts "...couldn't stop all threads cleanly."
+            log.info "Could not cleanly terminate all threads."
+            log.close
+            exit(1)
+          rescue ThreadTerminator
+            # ignore it, since it's come from one of the recently-nuked threads.
+          rescue Exception => e
+            log.debug ["Caught unhandled exception: ",
+                       e.class.to_s,
+                       e.message,
+                       *e.backtrace].join("\n")
+          end
+          
+          puts "...exited cleanly."
+          log.info "Terminated all threads cleanly."
+          log.close
+          exit(0)
+        end
       end
       
       private

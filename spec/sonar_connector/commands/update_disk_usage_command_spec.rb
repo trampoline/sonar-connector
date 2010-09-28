@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Sonar::Connector::UpdateDiskUsageCommand do
   
-  it "update the disk usage statistic" do
+  it "should update the disk usage statistic" do
     @connector = Object.new
     mock(@connector).connector_dir{"dir"}
     mock(@connector).name{"name"}

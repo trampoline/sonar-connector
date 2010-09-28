@@ -6,6 +6,7 @@ describe Sonar::Connector::Consumer do
     before do
       @log = Object.new
       @status = Object.new
+      @controller = Object.new
     end
     
     describe "initialize" do
@@ -17,6 +18,10 @@ describe Sonar::Connector::Consumer do
       it "should set status" do
         ec = Sonar::Connector::ExecutionContext.new(:status=>@status)
         ec.status.should == @status
+      end
+      
+      it "should set controller" do
+        Sonar::Connector::ExecutionContext.new(:controller=>@controller).controller.should == @controller
       end
     end
   end
@@ -38,7 +43,7 @@ describe Sonar::Connector::Consumer do
     before do
       setup_valid_config_file
       @controller = Sonar::Connector::Controller.new(valid_config_filename)
-      @consumer = Sonar::Connector::Consumer.new(@controller.config)
+      @consumer = Sonar::Connector::Consumer.new(@controller, @controller.config)
       @kommand = new_command_class("DummyCommand")
       @queue = Queue.new
     end

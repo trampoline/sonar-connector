@@ -7,7 +7,7 @@ describe Sonar::Connector::UpdateStatusCommand do
     Sonar::Connector::ACTION_FAILED
   end
   
-  it "update the disk usage statistic" do
+  it "should update the disk usage statistic" do
     @connector = Object.new
     mock(@connector).name{"name"}
     

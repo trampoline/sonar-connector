@@ -6,10 +6,15 @@ module Sonar
     class ExecutionContext
         attr_reader :log
         attr_reader :status
+        attr_reader :controller
         
         def initialize(params)
           @log = params[:log]
           @status = params[:status]
+          
+          # pass the controller all the way from the consumer initialisation into the command execution context,
+          # so that we can call privileged methods such as shutdown.
+          @controller = params[:controller]
         end
     end
     
@@ -20,11 +25,13 @@ module Sonar
       
       attr_reader :base_config
       attr_reader :queue
+      attr_reader :controller
       attr_reader :status
       attr_reader :log
       attr_reader :run
       
-      def initialize(base_config)
+      def initialize(controller, base_config)
+        @controller = controller
         @base_config = base_config
         
         # Consumer holds the status object because changes 
@@ -38,6 +45,8 @@ module Sonar
         @run = true
       end
 
+      # It's kinda evil to be passing in the controller here. The better option is to 
+      # refactor the consumer to be part of the controller.
       def prepare(queue)
         @queue = queue
         switch_to_log_file
@@ -72,7 +81,7 @@ module Sonar
       def run_once
         begin
           command = queue.pop
-          command.execute ExecutionContext.new(:log=>log, :status=>status)
+          command.execute ExecutionContext.new(:log=>log, :status=>status, :controller=>controller)
         rescue ThreadTerminator => e
           raise
         rescue Exception => e

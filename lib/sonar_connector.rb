@@ -28,11 +28,13 @@ require 'sonar_connector_filestore'
   utils
   connectors/base
   connectors/dummy_connector
+  connectors/seppuku_connector
   commands/command
   commands/update_status_command
   commands/send_admin_email_command
   commands/update_disk_usage_command
   commands/increment_status_value_command
+  commands/commit_seppuku_command
 ).each do |file|
   require File.join('sonar_connector', file)
 end

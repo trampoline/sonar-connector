@@ -1,0 +1,82 @@
+{
+  /* log level must be one of: "debug", "info", "warn", "error", "fatal" */
+  "log_level" : "debug",
+  
+  /* max log file size in megabytes */
+  "log_file_max_size" : "10",
+  
+  /* number of log files to keep */
+  "log_files_to_keep" : "7",
+  
+  "email_settings": {
+    "admin_recipients": ["admin@server.local"],
+    "admin_sender": "Sonar Connector <noreply@server.local>",
+    "perform_deliveries": false,
+    
+    /* options are ["smtp", "sendmail", "test"] */
+    "delivery_method": "smtp",
+    "save_emails_to_disk": true,
+    
+    "smtp_settings": {
+      "address": "127.0.0.1",
+      "port": 25,
+      "domain": "server.local",
+      "user_name": null,
+      "password": null,
+      
+      /* options are ["plain", "login", "cram_md5"] */
+      "authentication": null
+    },
+    
+    "sendmail_settings": {
+      "location": "/usr/sbin/sendmail",
+      "arguments": "-i -t -f nobody@localhost"
+    }
+  },
+  
+  /* 
+    Specific configuration for each connector. Each connector must have 
+    a class and a unique name. The require load path can also be specified if necessary.
+    Note that each connector type may have further configuration options
+    that are specific to the connector class.
+  */
+  "connectors": [
+    {
+      "class": "Sonar::Connector::ImapPullConnector",
+      "require": "sonar_imap_pull_connector",
+      "name": "gmail_1",
+      "repeat_delay": 10,
+      "host": "imap.gmail.com",
+      "user": "foo@bar.com",
+      "password": "---",
+      "folders": "[Gmail]/All Mail"
+    }
+    ,
+   {
+      "class": "Sonar::Connector::ImapPullConnector",
+      "require": "sonar_imap_pull_connector",
+      "name": "gmail_2",
+      "repeat_delay": 10,
+      "host": "imap.gmail.com",
+      "user": "baz@bar.com",
+      "password": "---",
+      "folders": "[Google Mail]/All Mail"
+    }
+     ,
+    {
+     "class": "Sonar::Connector::SonarPushConnector",
+     "require": "sonar_push_connector",
+     "name": "sonar_push",
+     "repeat_delay": 10,
+     "source_connectors": ["gmail_1", "gmail_2"],
+     "uri": "http://localhost:3000/api/1_0/rfc822_messages",
+     "connector_credentials": "---"
+    },
+    {
+     "class": "Sonar::Connector::SeppukuConnector",
+     "name": "seppuku",
+     "enabled": true,
+     "repeat_delay": 43200
+    }
+  ] 
+}

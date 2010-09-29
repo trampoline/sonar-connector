@@ -1,0 +1,18 @@
+Trampoline SONAR Connector framework
+
+== Dependencies
+
+=== Jruby
+
+Here's how to install jruby 1.4.0 on OS X:
+  
+  wget http://jruby.kenai.com/downloads/1.4.0/jruby-bin-1.4.0.tar.gz
+  sudo tar xfvz jruby-bin-1.4.0.tar.gz -C /usr/local/
+  ln -s /usr/local/jruby/bin/jruby /usr/bin/jruby
+  ln -s /usr/local/jruby/bin/rake /usr/bin/jrake
+  ln -s /usr/local/jruby/bin/gem /usr/bin/jgem
+  ln -s /usr/local/jruby/bin/jirb /usr/bin/jirb
+
+== Copyright
+
+Copyright (c) 2010 Trampoline Systems Ltd. See LICENSE for details.

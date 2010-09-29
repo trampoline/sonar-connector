@@ -1,0 +1,30 @@
+## MAC OS
+.DS_Store
+
+## TEXTMATE
+*.tmproj
+tmtags
+
+## EMACS
+*~
+\#*
+.\#*
+
+## VIM
+*.swp
+
+## PROJECT::GENERAL
+coverage
+rdoc
+pkg
+*.gemspec
+
+## PROJECT::SPECIFIC
+var/*
+log/*
+config/config.json
+.bundle
+sent_administrator_emails/*
+status.yml
+.yardoc/*
+doc/*

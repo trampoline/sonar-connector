@@ -44,10 +44,10 @@
     {
       "class": "Sonar::Connector::ImapPullConnector",
       "require": "sonar_imap_pull_connector",
-      "name": "gmail_mccraig",
+      "name": "gmail_1",
       "repeat_delay": 10,
       "host": "imap.gmail.com",
-      "user": "craig@trampolinesystems.com",
+      "user": "foo@bar.com",
       "password": "---",
       "folders": "[Gmail]/All Mail"
     }
@@ -55,10 +55,10 @@
    {
       "class": "Sonar::Connector::ImapPullConnector",
       "require": "sonar_imap_pull_connector",
-      "name": "gmail_car0lus",
+      "name": "gmail_2",
       "repeat_delay": 10,
       "host": "imap.gmail.com",
-      "user": "charles@trampolinesystems.com",
+      "user": "baz@bar.com",
       "password": "---",
       "folders": "[Google Mail]/All Mail"
     }
@@ -68,7 +68,7 @@
      "require": "sonar_push_connector",
      "name": "sonar_push",
      "repeat_delay": 10,
-     "source_connectors": ["gmail_car0lus", "gmail_mccraig"],
+     "source_connectors": ["gmail_1", "gmail_2"],
      "uri": "http://localhost:3000/api/1_0/rfc822_messages",
      "connector_credentials": "---"
     },

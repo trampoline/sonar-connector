@@ -213,10 +213,12 @@ module Sonar
       end
 
       def finalize_action_filestore(fs)
-        [:complete, :error, :working].each do |area|
+        [:complete, :error].each do |area|
           fs.scrub!(area)
-          fs.flip(area, connector_filestore, area)
+          fs.flip(area, connector_filestore, area, false) # flip with uuid folders
         end
+        fs.scrub!(:working)
+        fs.flip(:working, connector_filestore, :working) # flip without folders
         fs.destroy!
       end
 

@@ -225,7 +225,7 @@ module Sonar
         
         Dir.foreach(actionfs_root) do |fs_name|
           fs_path = File.join(actionfs_root, fs_name)
-          if File.directory?(fs_path) && FileStore.valid_filestore_name(fs_name)
+          if File.directory?(fs_path) && FileStore.valid_filestore_name?(fs_name)
             fs = FileStore.new(actionfs_root, fs_name, [:working, :error, :complete], :logger=>@log)
             finalize_action_filestore(fs)
           end

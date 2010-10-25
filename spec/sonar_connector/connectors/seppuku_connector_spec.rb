@@ -8,24 +8,6 @@ describe Sonar::Connector::SeppukuConnector do
   end
   
   describe "parse" do
-    it "should set enabled to false if not present in config" do
-      @config["enabled"].should be_blank
-      @connector = Sonar::Connector::SeppukuConnector.new(@config, @base_config)
-      @connector.enabled.should be_false
-    end
-    
-    it "should set enabled to false if anything but true in config" do
-      @config["enabled"] = 'true'
-      @connector = Sonar::Connector::SeppukuConnector.new(@config, @base_config)
-      @connector.enabled.should be_false
-    end
-    
-    it "should set enabled to true if true in config" do
-      @config["enabled"] = true
-      @connector = Sonar::Connector::SeppukuConnector.new(@config, @base_config)
-      @connector.enabled.should be_true
-    end
-    
     it "should set up a run counter" do
       @connector = Sonar::Connector::SeppukuConnector.new(@config, @base_config)
       @connector.run_count.should == 0
@@ -34,7 +16,6 @@ describe Sonar::Connector::SeppukuConnector do
   
   describe "action" do
     before do
-      @config["enabled"] = true
       @connector = Sonar::Connector::SeppukuConnector.new(@config, @base_config)
       @queue = []
       stub(@connector).queue{@queue}

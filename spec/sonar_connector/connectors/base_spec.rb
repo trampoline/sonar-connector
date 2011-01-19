@@ -78,6 +78,15 @@ describe Sonar::Connector::Base do
       end
       @connector.read_state.should == {}
     end
+
+    it "should return an empty-hash if the yaml read returns a non-hash" do
+      mock(File).exist?(@connector.send :state_file){true}
+      mock(YAML).load_file(@connector.send :state_file) { false }
+      mock(@connector.log).error(anything) do |param|
+        param.should match(/error loading/)
+      end
+      @connector.read_state.should == {}
+    end
     
   end
   

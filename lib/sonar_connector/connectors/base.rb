@@ -95,8 +95,9 @@ module Sonar
       # Read state file
       def read_state
         s = {}
-        s = YAML.load_file state_file if File.exist?(state_file)
-        raise "State file did not contain a serialised hash." unless s.is_a?(Hash)
+        ds = YAML.load_file state_file if File.exist?(state_file)
+        raise "State file did not contain a serialised hash." unless ds.is_a?(Hash)
+        s = ds  # only return the parsed value if it is actually a hash
       rescue Exception => e
         log.error "Error loading #{state_file} so it was ignored. Original error: #{e.message}\n" + e.backtrace.join("\n")
       ensure 

@@ -206,7 +206,9 @@ module Sonar
         now = Time.new
         fs_name = now.strftime("action_%Y%m%d_%H%M%S_") + UUIDTools::UUID.timestamp_create.to_s.gsub('-','_')
         action_fs_root = connector_filestore.area_path(:actions)
-        FileStore.new(action_fs_root, fs_name, [:working, :error, :complete], :logger=>@log)
+        fs=FileStore.new(action_fs_root, fs_name, [:working, :error, :complete], :logger=>@log)
+        log.info("action_filestore path: #{fs.filestore_path}")
+        fs
       end
 
       def initialize_action_filestore(fs)

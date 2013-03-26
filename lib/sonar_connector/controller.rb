@@ -112,7 +112,7 @@ module Sonar
       
       
       def shutdown_lambda
-        lambda do
+        ->(_) {
           puts "\nGiving threads 10 seconds to shut down..."
           threads.each{|t| t.raise(ThreadTerminator)}
           begin
@@ -137,7 +137,7 @@ module Sonar
           log.info "Terminated all threads cleanly."
           log.close
           exit(0)
-        end
+        }
       end
       
       private

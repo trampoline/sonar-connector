@@ -8,7 +8,7 @@ describe Sonar::Connector::CommitSeppukuCommand do
     stub(@connector).name{"name"}
   end
   
-  it "should update the disk usage statistic" do
+  it "should run the shutdown lambda" do
     @command = Sonar::Connector::CommitSeppukuCommand.new
     
     @context = Object.new
@@ -20,6 +20,7 @@ describe Sonar::Connector::CommitSeppukuCommand do
     mock(@shutdown_lambda).call
     
     @command.execute(@context)
+    sleep(1)
   end
   
 end

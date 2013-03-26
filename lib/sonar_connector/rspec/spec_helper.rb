@@ -1,9 +1,9 @@
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 require 'rr'
 
-Spec::Runner.configure do |config|
-  config.mock_with RR::Adapters::Rspec
+RSpec.configure do |config|
+  config.include(RR::Adapters::RSpec2)
   
   config.prepend_before(:each) do
     

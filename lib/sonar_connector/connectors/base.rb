@@ -61,10 +61,12 @@ module Sonar
         # empty state hash which will get written to by parse, and then potentially over-written by load_state
         @state = {}
 
-        @connector_filestore = Sonar::Connector::FileStore.new(@connector_dir, 
-                                                               "#{@name}_filestore", 
-                                                               [:working, :error, :complete, :actions],
-                                                               :logger=>@log)
+        @connector_filestore = Sonar::Connector::FileStore.new(
+          @connector_dir, 
+          "#{@name}_filestore", 
+          [:working, :error, :complete, :actions],
+          :logger=>@log
+        )
 
         parse connector_config
         load_state

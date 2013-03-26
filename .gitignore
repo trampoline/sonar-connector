@@ -17,7 +17,9 @@ tmtags
 coverage
 rdoc
 pkg
-*.gemspec
+/.bundle
+vendor/jruby
+vendor/ruby
 
 ## PROJECT::SPECIFIC
 var/*

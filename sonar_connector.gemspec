@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "sonar_connector"
-  s.version = "0.10.0"
+  s.version = "0.10.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Peter MacRobert"]
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
-    ".rvmrc",
+    ".ruby-version",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE",
@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
     "lib/sonar_connector/status.rb",
     "lib/sonar_connector/utils.rb",
     "script/console",
+    "sonar_connector.gemspec",
     "spec/sonar_connector/commands/command_spec.rb",
     "spec/sonar_connector/commands/commit_seppuku_command_spec.rb",
     "spec/sonar_connector/commands/increment_status_value_command_spec.rb",

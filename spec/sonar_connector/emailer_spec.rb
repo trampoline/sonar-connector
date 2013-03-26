@@ -22,7 +22,8 @@ describe Sonar::Connector::Emailer do
   end
   
   it "should have correct sender" do
-    @email.from.should == @base_config.email_settings["admin_sender"].to_a
+    @email.from.size.should == 1
+    @email.from.first.should == @base_config.email_settings["admin_sender"]
   end
   
   it "should have correct recipient" do

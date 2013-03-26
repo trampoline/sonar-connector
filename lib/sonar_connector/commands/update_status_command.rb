@@ -6,9 +6,9 @@ module Sonar
     
     class UpdateStatusCommand < Sonar::Connector::Command
       def initialize(connector, field, value)
-        l = lambda do
+        l = ->(_) {
           status.set connector.name, field, value
-        end
+        }
         super(l)
       end
     end

@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "actionmailer", "~> 2.3.10"
+gem "actionmailer", "~> 2.3.10", require: "action_mailer"
 gem "actionmailer_extensions", "~> 0.5"
 gem "json_pure", ">= 1.2.2"
 gem "uuidtools", ">= 2.1.1"

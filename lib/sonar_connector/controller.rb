@@ -1,3 +1,5 @@
+require 'timeout'
+
 module Sonar
   module Connector
     
@@ -112,7 +114,7 @@ module Sonar
       
       
       def shutdown_lambda
-        ->(_) {
+        ->(_=nil) {
           puts "\nGiving threads 10 seconds to shut down..."
           threads.each{|t| t.raise(ThreadTerminator)}
           begin

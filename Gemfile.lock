@@ -4,8 +4,9 @@ GIT
   specs:
     rr (1.0.4)
 
-PATH
-  remote: ~/development/pxi/connector/sonar-connector-filestore
+GIT
+  remote: git://github.com/trampoline/sonar-connector-filestore.git
+  revision: dc9c3a4c1d7129f08567710f142010c2e2fe20dd
   specs:
     sonar_connector_filestore (0.4.0)
       uuidtools

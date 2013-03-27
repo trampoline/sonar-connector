@@ -4,7 +4,7 @@ gem "actionmailer", "~> 2.3.10", require: "action_mailer"
 gem "actionmailer_extensions", "~> 0.5"
 gem "json_pure", ">= 1.2.2"
 gem "uuidtools", ">= 2.1.1"
-gem "sonar_connector_filestore", "~> 0.4.0", path: "~/development/pxi/connector/sonar-connector-filestore"
+gem "sonar_connector_filestore", "~> 0.4.0", :github=> "trampoline/sonar-connector-filestore"
 
 group :development do
   gem "rake", "~> 10.0.3"
@@ -12,5 +12,5 @@ group :development do
   gem "rdoc", "~> 4.0.0"
   gem "bundler", "~> 1.3.2"
   gem "jeweler", "~> 1.8.4"
-  gem 'rr', github: "btakita/rr"
+  gem 'rr', :github=> "btakita/rr"
 end

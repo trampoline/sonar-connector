@@ -1,0 +1,3 @@
+script: "JRUBY_OPTS=-J-Djruby.objectspace.enabled=true rake"
+rvm:
+  - jruby

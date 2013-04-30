@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "sonar_connector"
-  s.version = "0.11.2"
+  s.version = "0.11.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Peter MacRobert"]
-  s.date = "2013-03-26"
+  s.date = "2013-04-30"
   s.description = "Framework that allows arbitrary push and pull connectors to send data to an instance of the Trampoline SONAR server"
   s.email = "originalpete@gmail.com"
   s.executables = ["sonar-connector"]
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".ruby-version",
+    ".travis.yml",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE",
@@ -67,7 +68,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/trampoline/sonar-connector"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.24"
+  s.rubygems_version = "1.8.25"
   s.summary = "A behind-the-firewall connector for Trampoline SONAR"
 
   if s.respond_to? :specification_version then
